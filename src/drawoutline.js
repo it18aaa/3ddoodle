@@ -20,10 +20,13 @@ import {
   createOutlineScene,
 } from "./modules/scene";
 import { button, rangeSlider } from "./modules/guiComponents";
+import { Outline } from "./modules/outline"
 import { EVENTS, EventBus } from "./modules/eventBus";
 import $ from "jquery";
 
 
+
+// init this part of the app
 const eventBus = new EventBus();
 
 const canvas = document.getElementById("renderCanvas");
@@ -41,6 +44,8 @@ camera.attachControl(canvas, false);
 let divFps = document.getElementById("fps");
 var showfps = 1;
 
+const outline = new Outline(scene);
+
 drawGui();
 
 // run the renderloop
@@ -55,6 +60,8 @@ function getCameraActive() {
     return camera.inputs.attachedElement ? true : false;
 }
 
+
+
 // mode toggle button
 eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
     
@@ -63,6 +70,8 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
       // and set up drawing mode
     camera.detachControl(canvas);
     eventBus.dispatch(EVENTS.CAMERA_FROZEN);
+
+
   } else {
     // kill drawing mode and attach
     // mouse input to camera...
@@ -70,13 +79,6 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
     eventBus.dispatch(EVENTS.CAMERA_UNFROZEN);
   }
 });
-
-
-
-
-
-
-
 
 
 
