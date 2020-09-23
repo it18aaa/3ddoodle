@@ -1,0 +1,31 @@
+Exporter version: 6.4.3, Blender version: 2.83.3
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used :
+		Inline textures     :  false
+		Material Type       :  PBR
+		Positions Precision :  4
+		Normals Precision   :  3
+		UVs Precision       :  3
+		Vert Color Precision:  3
+		Mat Weight Precision:  2
+		Keep Z-up r-handed  :  no
+		Texture directory   :  C:\dev\src\3ddoodle\dist\
+	Python World class constructor completed
+	processing begun of mesh:  tree
+		processing begun of material:  Material.001
+			WARNING: unsupported node type(ShaderNodeBump) will trigger baking
+			processing texture BarkDecidious0194_7_S
+========= An error was encountered =========
+  File "C:\Users\ian\AppData\Roaming\Blender Foundation\Blender\2.83\scripts\addons\babylon_js\json_exporter.py", line 115, in execute
+    mesh = Mesh(object, scene, self)
+  File "C:\Users\ian\AppData\Roaming\Blender Foundation\Blender\2.83\scripts\addons\babylon_js\mesh.py", line 146, in __init__
+    recipe = BakingRecipe(bpyMesh, exporter)
+  File "C:\Users\ian\AppData\Roaming\Blender Foundation\Blender\2.83\scripts\addons\babylon_js\materials\baking_recipe.py", line 103, in __init__
+    self.bakedMaterial.processImageTextures(bpyMesh)
+  File "C:\Users\ian\AppData\Roaming\Blender Foundation\Blender\2.83\scripts\addons\babylon_js\materials\material.py", line 79, in processImageTextures
+    tex.process(self.exporter, True, bpyMesh)
+  File "C:\Users\ian\AppData\Roaming\Blender Foundation\Blender\2.83\scripts\addons\babylon_js\materials\texture.py", line 84, in process
+    self.uvMapName = bpyMesh.data.uv_layers.active.name
+ERROR:  'NoneType' object has no attribute 'name'
+========= end of processing =========
+elapsed time:  0 min, 0.0181 secs
