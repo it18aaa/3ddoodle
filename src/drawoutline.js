@@ -22,7 +22,7 @@ import {
 import { button, rangeSlider } from "./modules/guiComponents";
 import { Outline } from "./modules/outline"
 import { EVENTS, EventBus } from "./modules/eventBus";
-import $ from "jquery";
+import $, { get } from "jquery";
 
 
 
@@ -33,7 +33,7 @@ const canvas = document.getElementById("renderCanvas");
 
 const engine = new Engine(canvas, true, {
   stencil: true,
-}); 
+});
 
 const scene = createOutlineScene(engine);
 const camera = createCamera(canvas, scene);
@@ -57,19 +57,21 @@ engine.runRenderLoop(function () {
 });
 
 function getCameraActive() {
-    return camera.inputs.attachedElement ? true : false;
+  return camera.inputs.attachedElement ? true : false;
 }
 
 
 
 // mode toggle button
 eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
-    
+
   if (getCameraActive()) {
-      // detach mouse controls from camera
-      // and set up drawing mode
+    // detach mouse controls from camera
+    // and set up drawing mode
     camera.detachControl(canvas);
     eventBus.dispatch(EVENTS.CAMERA_FROZEN);
+
+
 
 
   } else {
@@ -82,13 +84,25 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
 
 
 
+
+canvas.addEventListener("contextmenu", (evt) => {
+  //alert("Context menu")
+  console.log(evt);
+  let pickResult = scene.pick(scene.pointerX, scene.pointerY);
+
+  console.log(pickResult);
+  
+  outline.addFencePost(pickResult.pickedPoint);
+
+});
+
 // the canvas/window resize event handler
 window.addEventListener("resize", function () {
   engine.resize();
 });
 
 function drawGui() {
-    
+
   $(".button-container").remove();
 
   $("body").append('<div class="button-container">Garden Designer! </div>');
@@ -97,9 +111,11 @@ function drawGui() {
   button("btnFreezeCamera", cam_default);
 
   // freeze camera button
-  $("#btnFreezeCamera").click((event) => {
+  $("#btnFreezeCamera").on('click', (event) => {
     eventBus.dispatch(EVENTS.GUI_CAMERA_FREEZE_TOGGLE);
   });
+
+
 
   // change icon when camera is frozen
   eventBus.subscribe(EVENTS.CAMERA_FROZEN, (payload) => {
