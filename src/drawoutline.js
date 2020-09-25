@@ -23,7 +23,7 @@ import { button, rangeSlider } from "./modules/guiComponents";
 import { Outline } from "./modules/outline"
 import { EVENTS, EventBus } from "./modules/eventBus";
 import $, { get } from "jquery";
-
+import { Mesh } from "@babylonjs/core/Meshes/mesh"
 
 
 // init this part of the app
@@ -46,7 +46,13 @@ var showfps = 1;
 
 const outline = new Outline(scene);
 
+scene.registerBeforeRender(function() {  
+  outline.updateMesh();
+});
+
 drawGui();
+
+
 
 // run the renderloop
 engine.runRenderLoop(function () {
@@ -60,7 +66,17 @@ function getCameraActive() {
   return camera.inputs.attachedElement ? true : false;
 }
 
+eventBus.subscribe(EVENTS.GUI_POLYGON, (payload) => {
+  outline.getPolygonFromLines();
+}) 
 
+eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
+  outline.reset();
+})
+
+eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
+  outline.getLengths();
+})
 
 // mode toggle button
 eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
@@ -87,11 +103,11 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
 
 canvas.addEventListener("contextmenu", (evt) => {
   //alert("Context menu")
-  console.log(evt);
+  //console.log(evt);
   let pickResult = scene.pick(scene.pointerX, scene.pointerY);
 
-  console.log(pickResult);
-  
+  //console.log(pickResult);
+
   outline.addFencePost(pickResult.pickedPoint);
 
 });
@@ -109,13 +125,26 @@ function drawGui() {
 
   let cam_default = "Camera Mode";
   button("btnFreezeCamera", cam_default);
+  button("btnPolygon", "Polygon");
+  button("btnClear", "Clear");
+  button("btnLength", "Lengths");
 
   // freeze camera button
   $("#btnFreezeCamera").on('click', (event) => {
     eventBus.dispatch(EVENTS.GUI_CAMERA_FREEZE_TOGGLE);
   });
 
+  $("#btnPolygon").on('click', (event) => {
+    eventBus.dispatch(EVENTS.GUI_POLYGON);
+  });
 
+  $("#btnClear").on('click', (event) => {
+    eventBus.dispatch(EVENTS.GUI_CLEAR);
+  });
+
+  $("#btnLength").on('click', (event) => {
+    eventBus.dispatch(EVENTS.GUI_LENGTH_BUTTON)
+  });
 
   // change icon when camera is frozen
   eventBus.subscribe(EVENTS.CAMERA_FROZEN, (payload) => {

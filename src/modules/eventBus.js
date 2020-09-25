@@ -9,7 +9,10 @@ export const EVENTS = Object.freeze({
     MOUSE_MESH_DRAG_END: Symbol("MOUSE_MESH_DRAG_END"),
     GUI_CAMERA_FREEZE_TOGGLE: Symbol("GUI_CAMERA_FREEZE_TOGGLE"),
     CAMERA_FROZEN: Symbol("CAMERA_FROZEN"),
-    CAMERA_UNFROZEN: Symbol("CAMERA_UNFROZEN")
+    CAMERA_UNFROZEN: Symbol("CAMERA_UNFROZEN"),
+    GUI_POLYGON: Symbol("GUI_POLYGON"), 
+    GUI_CLEAR: Symbol("GUI_CLEAR"),
+    GUI_LENGTH_BUTTON: Symbol("GUI_LENGTH_BUTTON")
 });
 
 export class EventBus {
