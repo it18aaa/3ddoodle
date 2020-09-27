@@ -24,18 +24,20 @@ import { Outline } from "./modules/outline"
 import { EVENTS, EventBus } from "./modules/eventBus";
 import $, { get } from "jquery";
 import { Mesh } from "@babylonjs/core/Meshes/mesh"
-
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 
 // init this part of the app
 const eventBus = new EventBus();
 
 const canvas = document.getElementById("renderCanvas");
 
+
 const engine = new Engine(canvas, true, {
   stencil: true,
 });
 
 const scene = createOutlineScene(engine);
+const adt = new AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 const camera = createCamera(canvas, scene);
 
 // attach camera to scene to start off with...

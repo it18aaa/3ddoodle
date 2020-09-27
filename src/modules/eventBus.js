@@ -26,7 +26,7 @@ export class EventBus {
         if(! this.#subscribers[type]) {
             this.#subscribers[type] = {};
         }
-
+ 
         this.#subscribers[type][id] = callback;
 
         console.log("registered new callback for ", type, id);
