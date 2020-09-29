@@ -46,7 +46,7 @@ camera.attachControl(canvas, false);
 let divFps = document.getElementById("fps");
 var showfps = 1;
 
-const outline = new Outline(scene);
+const outline = new Outline(scene, adt);
 
 scene.registerBeforeRender(function() {  
   outline.updateMesh();
