@@ -30,7 +30,6 @@ export class Outline {
     dimensions = {
         height: 1,
         depth: 1,
-
         width: 1,
         diameter: 0.2,
     };
@@ -38,14 +37,8 @@ export class Outline {
     constructor(scene, adt) {
         this.scene = scene;
         this.postMaterial = new StandardMaterial("postMaterial", scene);
-        this.postMaterial.diffuseColor = new Color3(0, 1, 0);
-        this.adt = adt;
-        // // for labels on lines
-        // this.adt = new AdvancedDynamicTexture.CreateFullscreenUI(
-        //   "UI",
-        //   true,
-        //   this.scene
-        // );
+        this.postMaterial.diffuseColor = new Color3(1, .5, 0);
+        this.adt = adt;        
     }
 
     createFencePost() {
@@ -62,8 +55,8 @@ export class Outline {
         );
 
         fencePost.material = this.postMaterial;
-
         fencePost.isPickable = true;
+
         const dragBehavior = new PointerDragBehavior({
             dragPlaneNormal: new Vector3(0, -1, 0),
         });
@@ -151,26 +144,28 @@ export class Outline {
         this.labels.forEach((label) => {
             this.adt.removeControl(label);
             label.dispose();
+
         });
         this.labels = [];
 
         let i = 0;
         this.lengths.forEach((length) => {
             let label = new TextBlock(
-                `label{$i}`,
+                `label${i}`,
                 `${i+1}`
             );
-            this.labels[i] = label;
+            
             this.adt.addControl(label);
             label.linkWithMesh(this.posts[i]);
-            label.outlineColor ="white" ;
-            label.color = "blue";
+            label.outlineColor ="black" ;
+            label.outlineWidth = 4;
+            label.fontSize = 22;
+            label.color = "yellow";
+            label.alpha = 0.7;
 
             label.linkOffsetX = 0;
-            label.linkOffsetY = -30;
-            //label.moveToVector3(this.posts[i].position, this.scene);
-            //   label._markAsDirty();
-            //   this.adt.markAsDirty();
+            label.linkOffsetY = -30;            
+            this.labels[i] = label;
             i++;
         });
     }
@@ -205,20 +200,27 @@ export class Outline {
         }
 
         if (this.polygon) {
-            this.polygon.dispose();
+             this.polygon.dispose();
         }
+
+        
 
         if (this.labels.length > 0) {
             this.labels.forEach((label) => {
+                console.log("Clearing: ", label);
                 this.adt.removeControl(label);
                 label.dispose();
             });
             this.labels = [];
         }
+        console.log(this.adt)
+        this.adt.clear();
+
+
     }
 
     getPolygonFromLines() {
-        console.log("getPolygonFromLines");
+        
 
         if (this.getLines().length > 2) {
             var corners = [];
@@ -226,7 +228,7 @@ export class Outline {
                 corners.push(new Vector2(line.x, line.z));
             });
 
-            console.log(corners);
+            //console.log(corners);
             var polygon_triangulation = new PolygonMeshBuilder(
                 "biff",
                 corners,
@@ -240,8 +242,18 @@ export class Outline {
             this.polygon = polygon_triangulation.build(false);
             // this.reset();
 
-            console.log(this.polygon);
-            this.polygon.position.y = 0.1;
+            //console.log(this.polygon);
+            this.polygon.position.y = 0.1;           
+
         }
     }
+
+    getPolygon() {
+        if(this.polygon) {
+            return this.polygon.clone();
+        } else {
+            return null;
+        }
+    }
+
 }

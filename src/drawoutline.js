@@ -48,6 +48,7 @@ var showfps = 1;
 
 const outline = new Outline(scene, adt);
 
+
 scene.registerBeforeRender(function() {  
   outline.updateMesh();
 });
@@ -78,6 +79,10 @@ eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
 
 eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
   outline.getLengths();
+})
+
+eventBus.subscribe(EVENTS.GUI_KEEP, (payload) => {
+  scene.addMesh(outline.getPolygon() );
 })
 
 // mode toggle button
@@ -130,6 +135,7 @@ function drawGui() {
   button("btnPolygon", "Polygon");
   button("btnClear", "Clear");
   button("btnLength", "Lengths");
+  button("btnKeep", "Keep");
 
   // freeze camera button
   $("#btnFreezeCamera").on('click', (event) => {
@@ -146,6 +152,10 @@ function drawGui() {
 
   $("#btnLength").on('click', (event) => {
     eventBus.dispatch(EVENTS.GUI_LENGTH_BUTTON)
+  });
+
+  $("#btnKeep").on('click', (event) => {
+    eventBus.dispatch(EVENTS.GUI_KEEP);
   });
 
   // change icon when camera is frozen
