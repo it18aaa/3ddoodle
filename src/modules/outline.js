@@ -20,7 +20,7 @@ export class Outline {
     posts = [];
     lengths = [];
     labels = [];
-    postCounter = 0;
+    // postCounter = 0;
     dragBehavior;
     linesMesh;
     polygon;
@@ -42,8 +42,10 @@ export class Outline {
     }
 
     createFencePost() {
-        this.postCounter++;
-        name = "post" + this.postCounter.toString();
+        // this.postCounter++;  // do we need this?
+        
+        //name = "post" + this.postCounter.toString();
+        name = "post" + (this.posts.length + 1);
 
         const fencePost = MeshBuilder.CreateCylinder(
             name,
@@ -70,6 +72,8 @@ export class Outline {
         return fencePost;
     }
 
+    // creates an array of Vector3 that containes the positions for 
+    // the lines
     getLines(posts) {
         const lines = [];
         this.posts.forEach((post) => {
@@ -78,7 +82,6 @@ export class Outline {
         if (this.posts[0]) {
             lines.push(this.posts[0].position);
         }
-
         return lines;
     }
 
@@ -86,6 +89,7 @@ export class Outline {
         return this.lengths;
     }
 
+    // updates the lengths array
     // only needs calling when a post is moved or a new post is added
     updateLengths() {
         if (this.posts.length > 1) {
@@ -102,6 +106,7 @@ export class Outline {
         }
     }
 
+    // adds a fence post at position ....    
     addFencePost(position) {
         if (position) {
             var newFencePost = this.createFencePost();
@@ -115,10 +120,38 @@ export class Outline {
         }
     }
 
-    resizeMesh() {
-        // size has changed, so dispose of old line mesh
-        // and create a new one
-        console.log(this.linesMesh);
+    undoAddFencePost() {
+        let post = this.posts.pop();
+        post.dispose();
+        this.updateLengths();
+        this.resizeMesh();
+        this.createLabels();        
+    }
+
+    delFencePostByName(name) {
+        //  delete from array and update lengths, resize mesh and delete label
+        // assume name is postXXX get the index, then knock it out the array
+        let index = parseInt(name.substring(4))-1;
+        console.log("Name: ", name);
+        console.log("post index: ", index);
+        this.posts[index].dispose();
+        this.posts.splice(index, 1);
+        this.updateLengths();
+        this.updatePostNames();
+        this.resizeMesh();
+        this.createLabels();
+    }
+
+    updatePostNames() {
+        
+        for(let i = 0; i < this.posts.length; i++) {
+            this.posts[i].name  = "post" + (i + 1);
+        }                    
+    }
+
+    resizeMesh() {        
+        // if the number of posts has has changed
+        // delete the old mesh and create anew         
         if (this.linesMesh) {
             this.linesMesh.dispose();
         }
@@ -131,12 +164,6 @@ export class Outline {
             },
             this.scene
         );
-    }
-
-
-    calcMid(p1, p2) {
-        console.log("calcmid: ", p1, p2);
-        return p1 + (p1.subtract(p2))
     }
 
     createLabels() {
@@ -152,7 +179,7 @@ export class Outline {
         this.lengths.forEach((length) => {
             let label = new TextBlock(
                 `label${i}`,
-                `${i+1}`
+                `${i+1}`                
             );
             
             this.adt.addControl(label);

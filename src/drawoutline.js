@@ -49,7 +49,7 @@ var showfps = 1;
 const outline = new Outline(scene, adt);
 
 
-scene.registerBeforeRender(function() {  
+scene.registerBeforeRender(function () {
   outline.updateMesh();
 });
 
@@ -71,7 +71,7 @@ function getCameraActive() {
 
 eventBus.subscribe(EVENTS.GUI_POLYGON, (payload) => {
   outline.getPolygonFromLines();
-}) 
+})
 
 eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
   outline.reset();
@@ -82,7 +82,7 @@ eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
 })
 
 eventBus.subscribe(EVENTS.GUI_KEEP, (payload) => {
-  scene.addMesh(outline.getPolygon() );
+  scene.addMesh(outline.getPolygon());
 })
 
 // mode toggle button
@@ -109,13 +109,16 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
 
 
 canvas.addEventListener("contextmenu", (evt) => {
-  //alert("Context menu")
-  //console.log(evt);
-  let pickResult = scene.pick(scene.pointerX, scene.pointerY);
 
-  //console.log(pickResult);
+  let picked = scene.pick(scene.pointerX, scene.pointerY);
 
-  outline.addFencePost(pickResult.pickedPoint);
+  if (picked.pickedMesh && picked.pickedMesh.name.substring(0, 4) == "post") {    
+    outline.delFencePostByName(picked.pickedMesh.name)
+  } else {
+    outline.addFencePost(picked.pickedPoint);
+  }
+
+
 
 });
 
