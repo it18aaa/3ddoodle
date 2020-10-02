@@ -69,23 +69,35 @@ function getCameraActive() {
   return camera.inputs.attachedElement ? true : false;
 }
 
+
+// CREATE POLYGON BUTTON
 eventBus.subscribe(EVENTS.GUI_POLYGON, (payload) => {
   outline.getPolygonFromLines();
 })
 
+// CLEAR BUTTON
 eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
   outline.reset();
 })
 
+
+// GET LENGTHS BUTTON
 eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
   outline.getLengths();
 })
 
+eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
+  outline.updateExtents();
+})
+
+
+// KEEP POLYGON BUTTON
 eventBus.subscribe(EVENTS.GUI_KEEP, (payload) => {
   scene.addMesh(outline.getPolygon());
 })
 
-// mode toggle button
+
+// CAMERA mode toggle button
 eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
 
   if (getCameraActive()) {
@@ -112,7 +124,7 @@ canvas.addEventListener("contextmenu", (evt) => {
 
   let picked = scene.pick(scene.pointerX, scene.pointerY);
 
-  if (picked.pickedMesh && picked.pickedMesh.name.substring(0, 4) == "post") {    
+  if (picked.pickedMesh && picked.pickedMesh.name.substring(0, 4) == "post") {
     outline.delFencePostByName(picked.pickedMesh.name)
   } else {
     outline.addFencePost(picked.pickedPoint);
@@ -139,6 +151,11 @@ function drawGui() {
   button("btnClear", "Clear");
   button("btnLength", "Lengths");
   button("btnKeep", "Keep");
+  button("btnBounding", "Bounding Box");
+
+  $("#btnBounding").on('click', (event) => {
+    eventBus.dispatch(EVENTS.GUI_BOUNDING);
+  })
 
   // freeze camera button
   $("#btnFreezeCamera").on('click', (event) => {

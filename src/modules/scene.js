@@ -21,14 +21,16 @@ export const createCamera = function (canvas, scene) {
   //const camera = new FreeCamera('camera', new Vector3(0, 5, -10), scene);
   const camera = new ArcRotateCamera(
     "camera1",
-    -Math.PI / 3,
-    (5 * Math.PI) / 12,
-    50,
+    -Math.PI / 1,
+    (2 * Math.PI) / 12,
+    10,
     new Vector3(0, 1, 0),
     scene
   );
-  camera.wheelPrecision = 23;
-
+  camera.wheelPrecision = 50;
+  //camera.panningSensibility = 1;
+  camera.angularSensibilityX = 6400;
+  camera.angularSensibilityY = 4400;
   camera.lowerBetaLimit = 0.01;
   camera.upperBetaLimit = Math.PI / 2 - 0.1;
 
@@ -40,7 +42,7 @@ export const createCamera = function (canvas, scene) {
 export const createOutlineScene = function(engine) {
   const scene = new Scene(engine);
 
-  scene.clearColor = new Color3(0.7, 0.85, 1);
+ scene.clearColor = new Color3(0.7, 0.85, 1);
 
   const light = new HemisphericLight(
     "hemiLight",
@@ -48,7 +50,7 @@ export const createOutlineScene = function(engine) {
     scene
   );
 
-  light.intensity = 0.6;
+  light.intensity = 0.8;
 
 
   // create a built in ground shape

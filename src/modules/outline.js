@@ -14,45 +14,53 @@ import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 
 import * as EarcutRef from "earcut";
+import { Line } from "@babylonjs/gui";
+import { Measurement } from "./measurement"
 
 export class Outline {
     scene;
     posts = [];
     lengths = [];
     labels = [];
-    // postCounter = 0;
+    extents = {};
     dragBehavior;
     linesMesh;
     polygon;
     showLabels = true;
+    measureX;
+    measureY;
 
     adt;
     dimensions = {
-        height: 1,
-        depth: 1,
-        width: 1,
-        diameter: 0.2,
+        height: .3,
+        diameterTop: 0.05,
+        diameterBottom: 0.02
     };
 
     constructor(scene, adt) {
         this.scene = scene;
         this.postMaterial = new StandardMaterial("postMaterial", scene);
         this.postMaterial.diffuseColor = new Color3(1, .5, 0);
-        this.adt = adt;        
+        this.adt = adt;
+        let mx = new Measurement(this.scene, this.adt, "x");
+        let my = new Measurement(this.scene, this.adt, "y");
+
+        mx.offset = .5;
+        mx.height = 0.25;
+        my.offset = .5;
+        my.height = 0.25;
+        
+        this.measureX = mx;
+        this.measureY = my;        
+
     }
 
     createFencePost() {
-        // this.postCounter++;  // do we need this?
-        
-        //name = "post" + this.postCounter.toString();
         name = "post" + (this.posts.length + 1);
 
         const fencePost = MeshBuilder.CreateCylinder(
             name,
-            {
-                height: this.dimensions.height,
-                diameter: this.dimensions.diameter,
-            },
+            this.dimensions,
             this.scene
         );
 
@@ -63,11 +71,12 @@ export class Outline {
             dragPlaneNormal: new Vector3(0, -1, 0),
         });
 
-        dragBehavior.onDragEndObservable.add((event) => {
-            this.createLabels();
+        fencePost.addBehavior(dragBehavior);
+
+        dragBehavior.onDragObservable.add((event) => {
+            this.updateExtents();
         });
 
-        fencePost.addBehavior(dragBehavior);
 
         return fencePost;
     }
@@ -77,10 +86,15 @@ export class Outline {
     getLines(posts) {
         const lines = [];
         this.posts.forEach((post) => {
-            lines.push(post.position);
+
+            var pos = post.position.clone(); // vector3
+            pos.y = 0.01;
+            lines.push(pos);
         });
         if (this.posts[0]) {
-            lines.push(this.posts[0].position);
+            var pos = this.posts[0].position.clone(); // vector3
+            pos.y = 0.01;
+            lines.push(pos);
         }
         return lines;
     }
@@ -116,7 +130,8 @@ export class Outline {
             this.posts.push(newFencePost);
             this.updateLengths();
             this.resizeMesh();
-            this.createLabels();
+            this.addLabel(newFencePost);
+            this.updateExtents();
         }
     }
 
@@ -125,31 +140,45 @@ export class Outline {
         post.dispose();
         this.updateLengths();
         this.resizeMesh();
-        this.createLabels();        
+        this.updateExtents();
     }
 
     delFencePostByName(name) {
         //  delete from array and update lengths, resize mesh and delete label
         // assume name is postXXX get the index, then knock it out the array
-        let index = parseInt(name.substring(4))-1;
-        console.log("Name: ", name);
-        console.log("post index: ", index);
+        let index = parseInt(name.substring(4)) - 1;
+
         this.posts[index].dispose();
+        this.labels[index].dispose();
         this.posts.splice(index, 1);
+        this.labels.splice(index, 1);
+
         this.updateLengths();
         this.updatePostNames();
         this.resizeMesh();
-        this.createLabels();
+        this.updateExtents();
+
     }
 
     updatePostNames() {
-        
-        for(let i = 0; i < this.posts.length; i++) {
-            this.posts[i].name  = "post" + (i + 1);
-        }                    
+        // iterate all posts and alter names and labels accordingly
+        for (let i = 0; i < this.posts.length; i++) {
+            this.posts[i].name = "post" + (i + 1);
+            // if(this.labels[i].name != "label" + (i + 1) ) {
+            this.labels[i].name = "label" + (i + 1);
+            this.labels[i].text = `${i + 1}`;
+            // }            
+        }
+
+
     }
 
-    resizeMesh() {        
+    getExtents() {
+        return this.extents;
+    }
+
+
+    resizeMesh() {
         // if the number of posts has has changed
         // delete the old mesh and create anew         
         if (this.linesMesh) {
@@ -166,40 +195,30 @@ export class Outline {
         );
     }
 
-    createLabels() {
-        // recreate labels - TODO: just push new label, and reattach all
-        this.labels.forEach((label) => {
-            this.adt.removeControl(label);
-            label.dispose();
+    addLabel(mesh) {
+        // remove 'post' from the name
+        let i = parseInt(mesh.name.substring(4)) - 1;
+        let label = new TextBlock(
+            `label${i}`,
+            `${i + 1}`
+        );
 
-        });
-        this.labels = [];
+        this.labels.push(label);
+        label.outlineColor = "black";
+        label.outlineWidth = 4;
+        label.fontSize = 22;
+        label.color = "yellow";
+        label.alpha = 0.7;
+        label.linkOffsetX = 0;
+        label.linkOffsetY = -30;
 
-        let i = 0;
-        this.lengths.forEach((length) => {
-            let label = new TextBlock(
-                `label${i}`,
-                `${i+1}`                
-            );
-            
-            this.adt.addControl(label);
-            label.linkWithMesh(this.posts[i]);
-            label.outlineColor ="black" ;
-            label.outlineWidth = 4;
-            label.fontSize = 22;
-            label.color = "yellow";
-            label.alpha = 0.7;
+        this.adt.addControl(label);
+        label.linkWithMesh(mesh);
 
-            label.linkOffsetX = 0;
-            label.linkOffsetY = -30;            
-            this.labels[i] = label;
-            i++;
-        });
     }
 
     updateMesh() {
-        // updates every frame - instance of lines, so they snap to
-        // the stringline posts
+
         this.linesMesh = MeshBuilder.CreateLines(null, {
             points: this.getLines(),
             instance: this.linesMesh,
@@ -207,55 +226,58 @@ export class Outline {
         this.updateLengths();
     }
 
-    updateLabels() {
-        for (let i = 0; i < this.lengths.length; i++) {
-            //this.labels[i].text(this.lengths[i].toString() + "m");
-            console.log("update labels  labels:", this.labels[i]);
+    updateExtents() {
+
+        let minX = this.posts[0].position.x;
+        let maxX = this.posts[0].position.x;
+        let minZ = this.posts[0].position.z;
+        let maxZ = this.posts[0].position.z;
+
+        this.posts.forEach(post => {
+            minX = minX > post.position.x ? post.position.x : minX;
+            maxX = maxX < post.position.x ? post.position.x : maxX;
+            minZ = minZ > post.position.z ? post.position.z : minZ;
+            maxZ = maxZ < post.position.z ? post.position.z : maxZ;
+        });
+
+        this.extents = {
+            min: new Vector3(minX, 0.5, minZ),
+            max: new Vector3(maxX, 0.5, maxZ),
+            length: maxX - minX,
+            width: maxZ - minZ
         }
+
     }
 
     reset() {
-        console.log("Clearing stuff!");
+        // cleanup
         this.posts.forEach((post) => {
             post.dispose();
         });
-
         this.posts = [];
-
         if (this.linesMesh) {
             this.linesMesh.dispose();
         }
-
         if (this.polygon) {
-             this.polygon.dispose();
+            this.polygon.dispose();
         }
-
-        
-
         if (this.labels.length > 0) {
             this.labels.forEach((label) => {
-                console.log("Clearing: ", label);
                 this.adt.removeControl(label);
                 label.dispose();
             });
             this.labels = [];
         }
-        console.log(this.adt)
         this.adt.clear();
-
-
     }
 
     getPolygonFromLines() {
-        
-
         if (this.getLines().length > 2) {
             var corners = [];
             this.getLines().forEach((line) => {
                 corners.push(new Vector2(line.x, line.z));
             });
 
-            //console.log(corners);
             var polygon_triangulation = new PolygonMeshBuilder(
                 "biff",
                 corners,
@@ -267,16 +289,13 @@ export class Outline {
                 this.polygon.dispose();
             }
             this.polygon = polygon_triangulation.build(false);
-            // this.reset();
-
-            //console.log(this.polygon);
-            this.polygon.position.y = 0.1;           
+            this.polygon.position.y = 0.0001;
 
         }
     }
 
     getPolygon() {
-        if(this.polygon) {
+        if (this.polygon) {
             return this.polygon.clone();
         } else {
             return null;
