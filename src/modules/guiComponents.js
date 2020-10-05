@@ -9,9 +9,12 @@ export function rangeSlider(
     min = 0,
     max = 10,
     step = 1,
-    container = "button-container"
+    container = "button-container", 
+    value = 5
 ) {
     $(`.${container}`).append(
         `<input id='${id}' type='range' min=${min} max=${max} step=${step}></input>`
     );
 }
+
+

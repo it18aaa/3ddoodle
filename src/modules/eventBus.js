@@ -13,7 +13,9 @@ export const EVENTS = Object.freeze({
     GUI_POLYGON: Symbol("GUI_POLYGON"), 
     GUI_CLEAR: Symbol("GUI_CLEAR"),
     GUI_LENGTH_BUTTON: Symbol("GUI_LENGTH_BUTTON"),
-    GUI_BOUNDING: Symbol("GUI_BOUNDING")
+    GUI_BOUNDING: Symbol("GUI_BOUNDING"),
+    GUI_TUBE: Symbol("GUI_TUBE"),
+    GUI_SHAPE: Symbol("GUI_SHAPE")
 });
 
 export class EventBus {

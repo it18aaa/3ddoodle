@@ -16,6 +16,8 @@ import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture
 import * as EarcutRef from "earcut";
 import { Line } from "@babylonjs/gui";
 import { Measurement } from "./measurement"
+import { Mesh } from "@babylonjs/core/Meshes";
+import { mitredExtrude } from "./mitredExtrude";
 
 export class Outline {
     scene;
@@ -40,7 +42,7 @@ export class Outline {
     constructor(scene, adt) {
         this.scene = scene;
         this.postMaterial = new StandardMaterial("postMaterial", scene);
-        this.postMaterial.diffuseColor = new Color3(1, .5, 0);
+        this.postMaterial.diffuseColor = new Color3(1, .5, 0);        
         this.adt = adt;
         let mx = new Measurement(this.scene, this.adt, "x");
         let my = new Measurement(this.scene, this.adt, "y");
@@ -49,9 +51,9 @@ export class Outline {
         mx.height = 0.25;
         my.offset = .5;
         my.height = 0.25;
-        
+
         this.measureX = mx;
-        this.measureY = my;        
+        this.measureY = my;
 
     }
 
@@ -289,9 +291,96 @@ export class Outline {
                 this.polygon.dispose();
             }
             this.polygon = polygon_triangulation.build(false);
-            this.polygon.position.y = 0.0001;
-
+            this.polygon.position.y = 0.001;
         }
+    }
+
+    getTubeFromLines() {
+        if (this.getLines().length > 2) {
+            var corners = [];
+            this.getLines().forEach(line => {
+                corners.push(new Vector3(line.x, 0.5, line.z));
+            });
+            this.tube = MeshBuilder.CreateTube("tube", {
+                path: corners,
+                radius: 0.5,
+                sideOrientation: Mesh.DOUBLESIDE,
+                updatable: true
+            },
+                this.scene);
+            this.tube.convertToFlatShadedMesh();
+        }
+    }
+
+
+    getStuffFromLines() {
+        if (this.getLines().length > 2) {
+            var corners = [];
+            this.getLines().forEach(line => {
+                corners.push(new Vector3(line.x, 0.001, line.z));
+            });
+            corners.pop();
+
+            var wallshape = [
+                new Vector3(.01, 0, 0),
+                new Vector3(.01, 1.8, 0),
+                new Vector3(0, 1.8, 0),
+                new Vector3(0, 0, 0),
+                new Vector3(0.01, 0, 0)
+            ]
+
+            this.extrusion = MeshBuilder.ExtrudeShape(
+                "thing",
+                {
+                    shape: wallshape,
+                    path: corners,
+                    sideOrientation: Mesh.DOUBLESIDE,
+                    updatable: true
+                },
+                this.scene);
+                this.extrusion.convertToFlatShadedMesh();
+        }
+
+    }
+
+
+    getMitredBoxFromLines() {
+        if (this.getLines().length > 2) {
+            var corners = [];
+            this.getLines().forEach(line => {
+                corners.push(new Vector3(line.x, 0.001, line.z));
+            });
+
+            var wallshape = [
+                new Vector3(.3, 0, 0),
+                new Vector3(.3, 1, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(0, 0, 0),
+                new Vector3(.3, 0, 0)
+            ]
+
+            // this.extrusion = MeshBuilder.ExtrudeShape(
+            //     "thing",
+            //     {
+            //         shape: wallshape,
+            //         path: corners,
+            //         sideOrientation: Mesh.DOUBLESIDE,
+            //         updatable: true
+            //     },
+            //     this.scene);
+            //     this.extrusion.convertToFlatShadedMesh();
+
+
+            this.extrusion = mitredExtrude("wall",
+                {
+                    path: corners,
+                    shape: wallshape
+                },
+                this.scene
+            );
+            this.extrusion.convertToFlatShadedMesh();
+        }
+
     }
 
     getPolygon() {

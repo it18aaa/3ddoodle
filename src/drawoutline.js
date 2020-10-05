@@ -97,6 +97,19 @@ eventBus.subscribe(EVENTS.GUI_KEEP, (payload) => {
 })
 
 
+// TUBE!
+eventBus.subscribe(EVENTS.GUI_TUBE, payload=> {
+  outline.getTubeFromLines();  
+})
+
+// Shape
+eventBus.subscribe(EVENTS.GUI_SHAPE, payload=> {
+  // outline.getWallFromLines();  
+  outline.getStuffFromLines();
+})
+
+
+
 // CAMERA mode toggle button
 eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
 
@@ -108,17 +121,16 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
 
 
 
-
   } else {
     // kill drawing mode and attach
     // mouse input to camera...
     camera.attachControl(canvas, true);
     eventBus.dispatch(EVENTS.CAMERA_UNFROZEN);
+
+
+
   }
 });
-
-
-
 
 canvas.addEventListener("contextmenu", (evt) => {
 
@@ -129,8 +141,6 @@ canvas.addEventListener("contextmenu", (evt) => {
   } else {
     outline.addFencePost(picked.pickedPoint);
   }
-
-
 
 });
 
@@ -152,6 +162,17 @@ function drawGui() {
   button("btnLength", "Lengths");
   button("btnKeep", "Keep");
   button("btnBounding", "Bounding Box");
+  button("btnTube", "Tube");
+  button("btnShape", "Shape");
+  rangeSlider("rngHeight", 0, 4, .1);
+
+  $("#btnShape").on('click', ev=>{
+    eventBus.dispatch(EVENTS.GUI_SHAPE);
+  })
+
+  $("#btnTube").on('click', event=>{
+    eventBus.dispatch(EVENTS.GUI_TUBE);
+  });
 
   $("#btnBounding").on('click', (event) => {
     eventBus.dispatch(EVENTS.GUI_BOUNDING);

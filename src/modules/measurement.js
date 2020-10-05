@@ -14,7 +14,7 @@ export class Measurement {
     visible;  // are we rendering?
     orientation;  // hack!  x (width) or y (length)
 
-    //  orientation shouldn't matter
+    //  orientation shouldn't matter but is hacked in for time being!
 
     prototype(scene, adt, orientation) {
         this.scene = scene;
@@ -60,9 +60,12 @@ export class Measurement {
         if (this.orientation === "y") {
             p.push(new Vector3(s.x, h, s.y));
             p.push(new Vector3(s.x - o, h, s.y));
-            p.push(new Vector3(s.x - o, h, s.y));
-
+            p.push(new Vector3(s.x - o, h, e.y));
+            p.push(new Vector3(e.x - o, h, e.y));            
+        } else {
+            p.push(new Vector3)
         }
+
 
 
 
