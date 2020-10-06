@@ -8,7 +8,7 @@ import { Vector2 } from "@babylonjs/core/Maths/math";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder/";
 import { Color3 } from "babylonjs";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { PolygonMeshBuilder } from "@babylonjs/core/Meshes/polygonMesh";
+
 
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
@@ -19,7 +19,7 @@ import { Measurement } from "./measurement"
 import { Mesh } from "@babylonjs/core/Meshes";
 import { mitredExtrude } from "./mitredExtrude";
 
-export class Outline {
+export class StringLine {
     scene;
     posts = [];
     lengths = [];
@@ -27,11 +27,13 @@ export class Outline {
     extents = {};
     dragBehavior;
     linesMesh;
-    polygon;
+    
+    type;
     showLabels = true;
     measureX;
     measureY;
-    polygon = null;
+    isClosed = true;
+    
 
     adt;
     dimensions = {
@@ -40,13 +42,16 @@ export class Outline {
         diameterBottom: 0.02
     };
 
-    constructor(scene, adt) {
+    constructor(scene, adt, isClosed) {
         this.scene = scene;
         this.postMaterial = new StandardMaterial("postMaterial", scene);
         this.postMaterial.diffuseColor = new Color3(1, .5, 0);        
         this.adt = adt;
+        this.isClosed = isClosed;
+
         let mx = new Measurement(this.scene, this.adt, "x");
         let my = new Measurement(this.scene, this.adt, "y");
+        
 
         mx.offset = .5;
         mx.height = 0.25;
@@ -55,9 +60,36 @@ export class Outline {
 
         this.measureX = mx;
         this.measureY = my;
+        
+        // the updater function updates the mesh
+        // we register it as a callback so it is performd before it renders
+        // and store a copy in the object, to unregister it later!
+        var that = this;
+        const updater = function() {
+            that.updateMesh();
+        }
+        this.scene.registerBeforeRender(updater);        
+
+        this.updater = updater;
 
     }
 
+    get type() {
+        return this.type;        
+    }
+
+    set type(type) {
+        this.type = type;
+    }
+    get isClosed() {
+        return this.isClosed;
+    }
+
+    set isClosed(value) {
+        if(value == true || value == false) {
+            this.isClosed = value;
+        }        
+    }
     createFencePost() {
         name = "post" + (this.posts.length + 1);
 
@@ -94,7 +126,9 @@ export class Outline {
             pos.y = 0.01;
             lines.push(pos);
         });
-        if (this.posts[0]) {
+
+        // close the loop!
+        if (this.posts[0] && this.isClosed) {
             var pos = this.posts[0].position.clone(); // vector3
             pos.y = 0.01;
             lines.push(pos);
@@ -139,6 +173,7 @@ export class Outline {
     }
 
     undoAddFencePost() {
+        // not yet implemented or tested, probably not required!
         let post = this.posts.pop();
         post.dispose();
         this.updateLengths();
@@ -172,8 +207,6 @@ export class Outline {
             this.labels[i].text = `${i + 1}`;
             // }            
         }
-
-
     }
 
     getExtents() {
@@ -258,12 +291,11 @@ export class Outline {
             post.dispose();
         });
         this.posts = [];
+
         if (this.linesMesh) {
             this.linesMesh.dispose();
         }
-        if (this.polygon) {
-            this.polygon.dispose();
-        }
+        
         if (this.labels.length > 0) {
             this.labels.forEach((label) => {
                 this.adt.removeControl(label);
@@ -271,129 +303,16 @@ export class Outline {
             });
             this.labels = [];
         }
-        this.adt.clear();
+        
+        // this.adt.clear();
     }
 
-    getPolygonFromLines() {
-        if (this.getLines().length > 2) {
-            var corners = [];
-            this.getLines().forEach((line) => {
-                corners.push(new Vector2(line.x, line.z));
-            });
-
-            var polygon_triangulation = new PolygonMeshBuilder(
-                "biff",
-                corners,
-                this.scene,
-                EarcutRef
-            );
-
-            if (this.polygon) {
-                this.polygon.dispose();
-            }
-            this.polygon = polygon_triangulation.build(false);
-            this.polygon.position.y = 0.001;
-        }
-    }
-
-    getTubeFromLines() {
-        if (this.getLines().length > 2) {
-            var corners = [];
-            this.getLines().forEach(line => {
-                corners.push(new Vector3(line.x, 0.5, line.z));
-            });
-            this.tube = MeshBuilder.CreateTube("tube", {
-                path: corners,
-                radius: 0.5,
-                sideOrientation: Mesh.DOUBLESIDE,
-                updatable: true
-            },
-                this.scene);
-            this.tube.convertToFlatShadedMesh();
-        }
-    }
-
-
-    getStuffFromLines() {
-        if (this.getLines().length > 2) {
-            var corners = [];
-            this.getLines().forEach(line => {
-                corners.push(new Vector3(line.x, 0.001, line.z));
-            });
-            corners.pop();
-
-            var wallshape = [
-                new Vector3(.01, 0, 0),
-                new Vector3(.01, 1.8, 0),
-                new Vector3(0, 1.8, 0),
-                new Vector3(0, 0, 0),
-                new Vector3(0.01, 0, 0)
-            ]
-
-            this.extrusion = MeshBuilder.ExtrudeShape(
-                "thing",
-                {
-                    shape: wallshape,
-                    path: corners,
-                    sideOrientation: Mesh.DOUBLESIDE,
-                    updatable: true
-                },
-                this.scene);
-                this.extrusion.convertToFlatShadedMesh();
-        }
-
-    }
-
-
-    getMitredBoxFromLines() {
-        if (this.getLines().length > 2) {
-            var corners = [];
-            this.getLines().forEach(line => {
-                corners.push(new Vector3(line.x, 0.001, line.z));
-            });
-
-            var wallshape = [
-                new Vector3(.3, 0, 0),
-                new Vector3(.3, 1, 0),
-                new Vector3(0, 1, 0),
-                new Vector3(0, 0, 0),
-                new Vector3(.3, 0, 0)
-            ]
-
-            // this.extrusion = MeshBuilder.ExtrudeShape(
-            //     "thing",
-            //     {
-            //         shape: wallshape,
-            //         path: corners,
-            //         sideOrientation: Mesh.DOUBLESIDE,
-            //         updatable: true
-            //     },
-            //     this.scene);
-            //     this.extrusion.convertToFlatShadedMesh();
-
-
-            this.extrusion = mitredExtrude("wall",
-                {
-                    path: corners,
-                    shape: wallshape
-                },
-                this.scene
-            );
-            this.extrusion.convertToFlatShadedMesh();
-        }
-
-    }
-
-    getPolygon() {
-        if (this.polygon ) {
-            console.log("returning polygon which is ", this.polygon)
-            let polygon = this.polygon.clone();
-            this.dispose();
-            return  polygon;
-        } else {
-            console.log("no polygon to return, return null")
-            return null;
-        }
+    dispose() {
+        this.reset();
+        this.adt = null;
+        var that = this;
+        this.scene.unregisterBeforeRender(this.updater)
+        this.scene = null;
     }
 
 }

@@ -15,7 +15,7 @@ export const EVENTS = Object.freeze({
     GUI_LENGTH_BUTTON: Symbol("GUI_LENGTH_BUTTON"),
     GUI_BOUNDING: Symbol("GUI_BOUNDING"),
     GUI_TUBE: Symbol("GUI_TUBE"),
-    GUI_SHAPE: Symbol("GUI_SHAPE")
+    GUI_FENCE: Symbol("GUI_FENCE")
 });
 
 export class EventBus {

@@ -4,12 +4,13 @@ import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Layers/effectLayerSceneComponent";
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/loadingScreen";
-import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
-import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRenderer";
-import { Vector3 } from "@babylonjs/core/Maths/math";
-import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-//import { PointerDragBehavior } from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
+// import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
+// import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRenderer";
+// import { Vector3 } from "@babylonjs/core/Maths/math";
+// import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
+// import { Color3 } from "@babylonjs/core/Maths/math.color";
+// //import { PointerDragBehavior } from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
+// import { VertexBuffer } from "@babylonjs/core/meshes"
 
 //import { PlaneRotationGizmo } from "@babylonjs/core/Gizmos/planeRotationGizmo";
 import { Engine } from "@babylonjs/core/Engines/engine";
@@ -20,7 +21,9 @@ import {
   createOutlineScene,
 } from "./modules/scene";
 import { button, rangeSlider } from "./modules/guiComponents";
-import { Outline } from "./modules/outline"
+import { StringLine } from "./modules/stringLine"
+
+import { RibbonFence } from "./modules/ribbonFence"
 import { EVENTS, EventBus } from "./modules/eventBus";
 import $, { get } from "jquery";
 import { Mesh } from "@babylonjs/core/Meshes/mesh"
@@ -39,6 +42,7 @@ const engine = new Engine(canvas, true, {
 const scene = createOutlineScene(engine);
 const adt = new AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 const camera = createCamera(canvas, scene);
+var counter = 0;
 
 // attach camera to scene to start off with...
 camera.attachControl(canvas, false);
@@ -46,12 +50,9 @@ camera.attachControl(canvas, false);
 let divFps = document.getElementById("fps");
 var showfps = 1;
 
-const outline = new Outline(scene, adt);
+//const outline = new Outline(scene, adt);
 
-
-scene.registerBeforeRender(function () {
-  outline.updateMesh();
-});
+const outline = new StringLine(scene, adt, false)
 
 drawGui();
 
@@ -83,7 +84,13 @@ eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
 
 // GET LENGTHS BUTTON
 eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
-  outline.getLengths();
+  let lengths = outline.getLengths();
+
+  var classType = outline.constructor.name;
+
+  console.log("classtype: ", outline.constructor.name);
+  console.log("super: ", outline);
+  console.log(lengths)
 })
 
 eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
@@ -93,19 +100,36 @@ eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
 
 // KEEP POLYGON BUTTON
 eventBus.subscribe(EVENTS.GUI_KEEP, (payload) => {
-  scene.addMesh(outline.getPolygon());
+  let p = outline.getPolygon();
+  if (p) {
+    scene.addMesh(p);
+  }
 })
 
 
 // TUBE!
-eventBus.subscribe(EVENTS.GUI_TUBE, payload=> {
-  outline.getTubeFromLines();  
+eventBus.subscribe(EVENTS.GUI_TUBE, payload => {
+  outline.getTubeFromLines();
 })
 
-// Shape
-eventBus.subscribe(EVENTS.GUI_SHAPE, payload=> {
-  // outline.getWallFromLines();  
-  outline.getStuffFromLines();
+
+// FENCE - currently making a fence!
+eventBus.subscribe(EVENTS.GUI_FENCE, payload => {
+  
+   
+   var f = new RibbonFence(outline);  
+
+   if(payload.height && payload.height > 0.1 && payload.height < 10) {
+     f.height = payload.height;
+   }
+   var mesh = f.getMesh();
+
+   counter++;
+   mesh.name = `fence${counter}`;
+      
+   scene.addMesh(mesh);
+   mesh.material = scene.getMaterialByName("woodFence");      
+  
 })
 
 
@@ -125,13 +149,12 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
     // kill drawing mode and attach
     // mouse input to camera...
     camera.attachControl(canvas, true);
-    eventBus.dispatch(EVENTS.CAMERA_UNFROZEN);
-
-
-
+   eventBus.dispatch(EVENTS.CAMERA_UNFROZEN);
   }
 });
 
+
+// if we're in string line mode .... 
 canvas.addEventListener("contextmenu", (evt) => {
 
   let picked = scene.pick(scene.pointerX, scene.pointerY);
@@ -163,14 +186,20 @@ function drawGui() {
   button("btnKeep", "Keep");
   button("btnBounding", "Bounding Box");
   button("btnTube", "Tube");
-  button("btnShape", "Shape");
-  rangeSlider("rngHeight", 0, 4, .1);
+  button("btnFence", "Fence");
+  rangeSlider("rngHeight", "height", 0, 4, .1);
 
-  $("#btnShape").on('click', ev=>{
-    eventBus.dispatch(EVENTS.GUI_SHAPE);
+$("#rngHeight").on('change', function(ev) {
+    this.text = "freddo "
+})
+
+  $("#btnFence").on('click', ev => {
+    var height = $("#rngHeight").val();
+    eventBus.dispatch(EVENTS.GUI_FENCE, { height: height });
   })
 
-  $("#btnTube").on('click', event=>{
+
+  $("#btnTube").on('click', event => {
     eventBus.dispatch(EVENTS.GUI_TUBE);
   });
 
@@ -210,3 +239,28 @@ function drawGui() {
     console.log("Camera Mode: use the mouse to move the camera around the scene")
   });
 }
+
+
+
+
+// utility method created by CeeJay on html5gameDevs
+//
+
+// function setUVScale(mesh, uScale, vScale) {
+//   var i,
+//     UVs = mesh.getVerticesData(VertexBuffer.UVKind),
+//     len = UVs.length;
+  
+//   if (uScale !== 1) {
+//     for (i = 0; i < len; i += 2) {
+//       UVs[i] *= uScale;
+//     }
+//   }
+//   if (vScale !== 1) {
+//     for (i = 1; i < len; i += 2) {
+//       UVs[i] *= vScale;
+//     }
+//   }
+  
+//   mesh.setVerticesData(VertexBuffer.UVKind, UVs);
+// }

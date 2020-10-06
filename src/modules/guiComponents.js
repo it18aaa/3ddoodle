@@ -6,6 +6,7 @@ export function button(id, text, container = "button-container") {
 
 export function rangeSlider(
     id,
+    text,
     min = 0,
     max = 10,
     step = 1,
@@ -13,7 +14,7 @@ export function rangeSlider(
     value = 5
 ) {
     $(`.${container}`).append(
-        `<input id='${id}' type='range' min=${min} max=${max} step=${step}></input>`
+        `<input id='${id}' type='range' min=${min} max=${max} step=${step}>${text}</input>`
     );
 }
 

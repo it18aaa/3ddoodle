@@ -39,10 +39,10 @@ export const createCamera = function (canvas, scene) {
   return camera;
 };
 
-export const createOutlineScene = function(engine) {
+export const createOutlineScene = function (engine) {
   const scene = new Scene(engine);
 
- scene.clearColor = new Color3(0.7, 0.85, 1);
+  scene.clearColor = new Color3(0.7, 0.85, 1);
 
   const light = new HemisphericLight(
     "hemiLight",
@@ -65,12 +65,18 @@ export const createOutlineScene = function(engine) {
   );
 
   const gridMaterial = new GridMaterial("gridMaterial", scene);
-  gridMaterial.lineColor = new Color3(0.3, 0.6, 0.4);
-  gridMaterial.mainColor = new Color3(0.6, 0.9, 0.8);
+  gridMaterial.mainColor = new Color3(0.9, 0.9, 0.9);
+  gridMaterial.lineColor = new Color3(0.3, 0.3, 0.3);
   gridMaterial.minorUnitVisibility = 0.25;
   gridMaterial.majorUnitFrequency = 5;
 
   ground.material = gridMaterial;
+
+
+  const woodenFenceMaterial = new StandardMaterial("woodFence", scene);
+  woodenFenceMaterial.diffuseTexture = new Texture("/img/wood.jpg")
+  woodenFenceMaterial.diffuseTexture.uScale = 14;
+  woodenFenceMaterial.diffuseTexture.vScale = 1;
 
   return scene;
 }
@@ -144,13 +150,13 @@ export const createScene = function (engine) {
 
   scene.clearColor = new Color3(0.7, 0.85, 1);
 
-    const light = new HemisphericLight(
-      "hemiLight",
-      new Vector3(-11, 15, 0),
-      scene
-    );
+  const light = new HemisphericLight(
+    "hemiLight",
+    new Vector3(-11, 15, 0),
+    scene
+  );
 
-    light.intensity = 0.1;
+  light.intensity = 0.1;
 
   const dlight = new DirectionalLight(
     "DirectionalLight",
@@ -189,6 +195,13 @@ export const createScene = function (engine) {
   const myMaterial = new StandardMaterial("myMaterial", scene);
   myMaterial.diffuseTexture = new Texture("/img/grass006.jpg");
 
+  const woodenFenceMaterial = new StandardMaterial("woodenFenceMaterial", scene);
+  woodenFenceMaterial.diffuseText = new Texture("/img/wood.jpg")
+
+  woodenFenceMaterial.diffuseTexture.uScale = 20;
+  woodenFenceMaterial.diffuseTexture.vScale = 20;
+
+
   ground.material = myMaterial;
   myMaterial.diffuseTexture.uScale = 20;
   myMaterial.diffuseTexture.vScale = 20;
@@ -218,7 +231,7 @@ export const createScene = function (engine) {
     (meshes) => {
       meshes[0].position.x = -7;
       meshes[0].position.z = -10;
-      meshes[0].scaling = new Vector3(.2,.2,.2);
+      meshes[0].scaling = new Vector3(.2, .2, .2);
       shadowGenerator.addShadowCaster(meshes[0])
     }
   );
@@ -230,7 +243,7 @@ export const createAltScene = function (engine) {
   const scene = new Scene(engine);
 
 
- 
+
 
   // create a built in ground shape
   const ground = MeshBuilder.CreateGround(
