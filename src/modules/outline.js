@@ -252,6 +252,7 @@ export class Outline {
 
     }
 
+
     reset() {
         // cleanup
         this.posts.forEach((post) => {
@@ -272,6 +273,7 @@ export class Outline {
             this.labels = [];
         }
         this.adt.clear();
+        //
     }
 
     getPolygonFromLines() {

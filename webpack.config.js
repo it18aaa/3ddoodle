@@ -1,7 +1,6 @@
 const path = require("path");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
-
 module.exports = {
     mode: 'development',
     entry: "./src/drawoutline.js",
@@ -24,9 +23,7 @@ module.exports = {
                     loader: 'babel-loader',
                     options: {
                         presets: ['@babel/preset-env'],
-
                         plugins: ['@babel/plugin-proposal-class-properties']
-
                     }
                 }
             },

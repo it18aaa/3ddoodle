@@ -42,7 +42,8 @@ export const createCamera = function (canvas, scene) {
 export const createOutlineScene = function (engine) {
   const scene = new Scene(engine);
 
-  scene.clearColor = new Color3(0.7, 0.85, 1);
+  // scene.clearColor = new Color3(0.7, 0.85, 1);
+  scene.clearColor = new Color3(0.8, 0.9, 1);
 
   const light = new HemisphericLight(
     "hemiLight",
@@ -65,10 +66,11 @@ export const createOutlineScene = function (engine) {
   );
 
   const gridMaterial = new GridMaterial("gridMaterial", scene);
-  gridMaterial.mainColor = new Color3(0.9, 0.9, 0.9);
-  gridMaterial.lineColor = new Color3(0.3, 0.3, 0.3);
-  gridMaterial.minorUnitVisibility = 0.25;
+  gridMaterial.mainColor = new Color3(0.94, 0.94, 0.94);
+  gridMaterial.lineColor = new Color3(0,0,0);
+  gridMaterial.minorUnitVisibility = .65;
   gridMaterial.majorUnitFrequency = 5;
+  gridMaterial.opacity = 0.9;
 
   ground.material = gridMaterial;
 
@@ -77,6 +79,12 @@ export const createOutlineScene = function (engine) {
   woodenFenceMaterial.diffuseTexture = new Texture("/img/wood.jpg")
   woodenFenceMaterial.diffuseTexture.uScale = 14;
   woodenFenceMaterial.diffuseTexture.vScale = 1;
+
+  const fenceMat = new StandardMaterial("fence", scene);
+  fenceMat.diffuseTexture = new Texture("/img/fence1.png");
+  fenceMat.diffuseTexture.uScale = 3;
+  fenceMat.diffuseTexture.vScale = 2;
+  fenceMat.diffuseTexture.hasAlpha = true;
 
   return scene;
 }

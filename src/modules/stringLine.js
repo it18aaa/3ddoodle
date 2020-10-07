@@ -213,7 +213,6 @@ export class StringLine {
         return this.extents;
     }
 
-
     resizeMesh() {
         // if the number of posts has has changed
         // delete the old mesh and create anew         
@@ -303,7 +302,7 @@ export class StringLine {
             });
             this.labels = [];
         }
-        
+
         // this.adt.clear();
     }
 
