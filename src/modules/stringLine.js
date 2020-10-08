@@ -1,23 +1,17 @@
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Meshes/meshBuilder";
-
 import { PointerDragBehavior } from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Vector2 } from "@babylonjs/core/Maths/math";
-
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder/";
 import { Color3 } from "babylonjs";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-
-
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-
-import * as EarcutRef from "earcut";
-import { Line } from "@babylonjs/gui";
+// import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+// import * as EarcutRef from "earcut";
+// import { Line } from "@babylonjs/gui";
 import { Measurement } from "./measurement"
-import { Mesh } from "@babylonjs/core/Meshes";
-import { mitredExtrude } from "./mitredExtrude";
+// import { Mesh } from "@babylonjs/core/Meshes";
+// import { mitredExtrude } from "./mitredExtrude";
 
 export class StringLine {
     scene;
@@ -27,13 +21,14 @@ export class StringLine {
     extents = {};
     dragBehavior;
     linesMesh;
-    
+    totalLength;
+
     type;
     showLabels = true;
-    measureX;
-    measureY;
+    // measureX;
+    // measureY;
     isClosed = true;
-    
+
 
     adt;
     dimensions = {
@@ -45,13 +40,13 @@ export class StringLine {
     constructor(scene, adt, isClosed) {
         this.scene = scene;
         this.postMaterial = new StandardMaterial("postMaterial", scene);
-        this.postMaterial.diffuseColor = new Color3(1, .5, 0);        
+        this.postMaterial.diffuseColor = new Color3(1, .5, 0);
         this.adt = adt;
         this.isClosed = isClosed;
 
         let mx = new Measurement(this.scene, this.adt, "x");
         let my = new Measurement(this.scene, this.adt, "y");
-        
+
 
         mx.offset = .5;
         mx.height = 0.25;
@@ -60,22 +55,22 @@ export class StringLine {
 
         this.measureX = mx;
         this.measureY = my;
-        
+
         // the updater function updates the mesh
         // we register it as a callback so it is performd before it renders
         // and store a copy in the object, to unregister it later!
         var that = this;
-        const updater = function() {
+        const updater = function () {
             that.updateMesh();
         }
-        this.scene.registerBeforeRender(updater);        
+        this.scene.registerBeforeRender(updater);
 
         this.updater = updater;
 
     }
 
     get type() {
-        return this.type;        
+        return this.type;
     }
 
     set type(type) {
@@ -86,9 +81,9 @@ export class StringLine {
     }
 
     set isClosed(value) {
-        if(value == true || value == false) {
+        if (value == true || value == false) {
             this.isClosed = value;
-        }        
+        }
     }
     createFencePost() {
         name = "post" + (this.posts.length + 1);
@@ -140,9 +135,23 @@ export class StringLine {
         return this.lengths;
     }
 
+    get totalLength() {
+        return this.totalLength;
+    }
+    updateTotalLength() {
+
+        if (this.lengths.length > 0) {
+            var sum = 0;
+            this.lengths.forEach(length => {
+                sum += length;
+            });
+            this.totalLength = sum;
+        }
+    }
     // updates the lengths array
     // only needs calling when a post is moved or a new post is added
     updateLengths() {
+
         if (this.posts.length > 1) {
             this.lengths = [];
             const last = this.posts.length - 1;
@@ -151,10 +160,16 @@ export class StringLine {
                     this.posts[i].position.subtract(this.posts[i + 1].position).length()
                 );
             }
-            this.lengths.push(
-                this.posts[last].position.subtract(this.posts[0].position).length()
-            );
+
+            // if the stringline is circular, and the last points
+            // connects to the first, add that
+            if (this.isClosed) {
+                this.lengths.push(
+                    this.posts[last].position.subtract(this.posts[0].position).length()
+                );
+            }
         }
+        this.updateTotalLength();
     }
 
     // adds a fence post at position ....    
@@ -294,7 +309,7 @@ export class StringLine {
         if (this.linesMesh) {
             this.linesMesh.dispose();
         }
-        
+
         if (this.labels.length > 0) {
             this.labels.forEach((label) => {
                 this.adt.removeControl(label);

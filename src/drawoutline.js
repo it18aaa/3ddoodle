@@ -79,14 +79,13 @@ function getCameraActive() {
 eventBus.subscribe(EVENTS.GUI_POLYGON, (payload) => {
   outline.getPolygonFromLines();
 })
-
+ 
 // CLEAR BUTTON
 eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
   outline.reset();
 })
 
-
-// GET LENGTHS BUTTON
+// GET LENGTHS BUTTON d
 eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
   let lengths = outline.getLengths();
 
@@ -95,8 +94,9 @@ eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
   console.log("classtype: ", outline.constructor.name);
   console.log("super: ", outline);
   console.log(lengths)
-
+  console.log(`total length: `, outline.totalLength)
 })
+
 
 eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
   outline.updateExtents();

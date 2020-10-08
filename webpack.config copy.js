@@ -1,16 +1,20 @@
 const path = require("path");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+// const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
     mode: 'development',
     entry: "./src/drawoutline.js",
+    devtool: 'source-map',
     output: {
         filename: "main.js",
         path: path.resolve(__dirname, "dist")
     },
     optimization: {
         minimize: true,
-        // minimizer: [new UglifyJsPlugin()]
+        minimizer: [new TerserPlugin({
+            test: /\.js(\?.*)?$/i,
+        })]
     },
     devServer: {
         contentBase: path.join(__dirname, "dist"),
