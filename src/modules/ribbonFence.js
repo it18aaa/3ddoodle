@@ -42,7 +42,7 @@ export class RibbonFence {
             console.log("arrays: ", [path1, path2])
             this.ribbon = MeshBuilder.CreateRibbon("ribbon",
                 {
-                    pathArray: [path1, path2, path1]
+                    pathArray: [path1, path2]
                 });
             this.ribbon.convertToFlatShadedMesh()   
             

@@ -1,17 +1,24 @@
 const path = require("path");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 
 module.exports = {
     mode: 'development',
+    devtools: 'source-maps',
     entry: "./src/drawoutline.js",
     output: {
         filename: "main.js",
         path: path.resolve(__dirname, "dist")
     },
     optimization: {
-        minimize: true,
+        // usedExports: true,
+        // minimize: true,
         // minimizer: [new UglifyJsPlugin()]
     },
+    // plugins: [
+    //     new BundleAnalyzerPlugin()
+    //     ],
     devServer: {
         contentBase: path.join(__dirname, "dist"),
         port: 9000
@@ -28,22 +35,22 @@ module.exports = {
                     }
                 }
             },
-            {
-                test: /\.css$/,
-                use: [{
-                        loader: 'style-loader'
-                    },
-                    {
-                        loader: 'css-loader'
-                    }
-                ]
-            },
-            {
-                test: /\.(png|jpg)$/,
-                use: [{
-                    loader: 'url-loader'
-                }]
-            }
+            // {
+            //     test: /\.css$/,
+            //     use: [{
+            //             loader: 'style-loader'
+            //         },
+            //         {
+            //             loader: 'css-loader'
+            //         }
+            //     ]
+            // },
+            // {
+            //     test: /\.(png|jpg)$/,
+            //     use: [{
+            //         loader: 'url-loader'
+            //     }]
+            // }
         ]
     }
 }

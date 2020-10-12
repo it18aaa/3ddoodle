@@ -1,33 +1,58 @@
-import "@babylonjs/core/Culling/ray";
-import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
-import "@babylonjs/core/Materials/standardMaterial";
-import "@babylonjs/core/Layers/effectLayerSceneComponent";
-import "@babylonjs/loaders";
-import "@babylonjs/core/Loading/loadingScreen";
+// import "@babylonjs/core/Culling/ray";
+// import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
+// import "@babylonjs/core/Materials/standardMaterial";
+// import "@babylonjs/core/Layers/effectLayerSceneComponent";
+// import "@babylonjs/loaders";
+// import "@babylonjs/core/Loading/loadingScreen";
 // import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 // import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRenderer";
-// import { Vector3 } from "@babylonjs/core/Maths/math";
+import {
+    Vector3
+} from "@babylonjs/core/Maths/math";
+import {
+    CubicEase
+} from "@babylonjs/core/Animations/easing";
+import {
+    EasingFunction
+} from "@babylonjs/core/Animations/easing"
+import {
+    Animation
+} from "@babylonjs/core/Animations/animation"
 // import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 // import { Color3 } from "@babylonjs/core/Maths/math.color";
 // //import { PointerDragBehavior } from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
 // import { VertexBuffer } from "@babylonjs/core/meshes"
 
 //import { PlaneRotationGizmo } from "@babylonjs/core/Gizmos/planeRotationGizmo";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import {
-  createScene,
-  createCamera,
-  createAltScene,
-  createOutlineScene,
+    Engine
+} from "@babylonjs/core/Engines/engine";
+import {
+    //   createScene,
+    createCamera,
+    //   createAltScene,
+    createOutlineScene,
 } from "./modules/scene";
-import { button, rangeSlider } from "./modules/guiComponents";
-import { StringLine } from "./modules/stringLine"
+import {
+    button,
+    rangeSlider
+} from "./modules/guiComponents";
+import {
+    StringLine
+} from "./modules/stringLine"
 
-import { RibbonFence } from "./modules/ribbonFence"
-import { EVENTS, EventBus } from "./modules/eventBus";
-import $, { get } from "jquery";
-import { Mesh } from "@babylonjs/core/Meshes/mesh"
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import {
+    RibbonFence
+} from "./modules/ribbonFence"
+import {
+    EVENTS,
+    EventBus
+} from "./modules/eventBus";
+import $ from "jquery";
+// import { Mesh } from "@babylonjs/core/Meshes/mesh"
+import {
+    AdvancedDynamicTexture
+} from "@babylonjs/gui/2D/advancedDynamicTexture";
 
 
 import "@babylonjs/core/Debug/debugLayer";
@@ -40,7 +65,7 @@ const canvas = document.getElementById("renderCanvas");
 
 
 const engine = new Engine(canvas, true, {
-  stencil: true,
+    stencil: true,
 });
 
 const scene = createOutlineScene(engine);
@@ -64,76 +89,76 @@ drawGui();
 
 // run the renderloop
 engine.runRenderLoop(function () {
-  if (showfps) {
-    divFps.innerHTML = engine.getFps().toFixed() + " fps";
-  }
-  scene.render();
+    if (showfps) {
+        divFps.innerHTML = engine.getFps().toFixed() + " fps";
+    }
+    scene.render();
 });
 
 function getCameraActive() {
-  return camera.inputs.attachedElement ? true : false;
+    return camera.inputs.attachedElement ? true : false;
 }
 
 
 // CREATE POLYGON BUTTON
 eventBus.subscribe(EVENTS.GUI_POLYGON, (payload) => {
-  outline.getPolygonFromLines();
+    outline.getPolygonFromLines();
 })
- 
+
 // CLEAR BUTTON
 eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
-  outline.reset();
+    outline.reset();
 })
 
 // GET LENGTHS BUTTON d
 eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
-  let lengths = outline.getLengths();
+    let lengths = outline.getLengths();
 
-  var classType = outline.constructor.name;
+    var classType = outline.constructor.name;
 
-  console.log("classtype: ", outline.constructor.name);
-  console.log("super: ", outline);
-  console.log(lengths)
-  console.log(`total length: `, outline.totalLength)
+    console.log("classtype: ", outline.constructor.name);
+    console.log("super: ", outline);
+    console.log(lengths)
+    console.log(`total length: `, outline.totalLength)
 })
 
 
 eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
-  outline.updateExtents();
+    outline.updateExtents();
 })
 
 
 // KEEP POLYGON BUTTON
 eventBus.subscribe(EVENTS.GUI_KEEP, (payload) => {
-  let p = outline.getPolygon();
-  if (p) {
-    scene.addMesh(p);
-  }
-  outline.reset();
+    let p = outline.getPolygon();
+    if (p) {
+        scene.addMesh(p);
+    }
+    outline.reset();
 })
 
 
 // TUBE!
 eventBus.subscribe(EVENTS.GUI_TUBE, payload => {
-  outline.getTubeFromLines();
+    outline.getTubeFromLines();
 })
 
 
 // FENCE - currently making a fence!
 eventBus.subscribe(EVENTS.GUI_FENCE, payload => {
-  var f = new RibbonFence(outline);
+    var f = new RibbonFence(outline);
 
-  if (payload.height && payload.height > 0.1 && payload.height < 10) {
-    f.height = payload.height;
-  }
-  var mesh = f.getMesh();
+    if (payload.height && payload.height > 0.1 && payload.height < 10) {
+        f.height = payload.height;
+    }
+    var mesh = f.getMesh();
 
-  counter++;
-  mesh.name = `fence${counter}`;
+    counter++;
+    mesh.name = `fence${counter}`;
 
-  scene.addMesh(mesh);
-  // mesh.material = scene.getMaterialByName("woodFence");
-  mesh.material = scene.getMaterialByName("fence");
+    scene.addMesh(mesh);
+    // mesh.material = scene.getMaterialByName("woodFence");
+    mesh.material = scene.getMaterialByName("fence");
 
 
 })
@@ -141,44 +166,83 @@ eventBus.subscribe(EVENTS.GUI_FENCE, payload => {
 // CAMERA mode toggle button
 eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
 
-  if (getCameraActive()) {
-    // detach mouse controls from camera
-    // and set up drawing mode
-    camera.detachControl(canvas);
-    eventBus.dispatch(EVENTS.CAMERA_FROZEN);
-  } else {
-    // kill drawing mode and attach
-    // mouse input to camera...
-    camera.attachControl(canvas, true);
-    eventBus.dispatch(EVENTS.CAMERA_UNFROZEN);
-  }
+    if (getCameraActive()) {
+        // detach mouse controls from camera
+        // and set up drawing mode
+        camera.detachControl(canvas);
+        eventBus.dispatch(EVENTS.CAMERA_FROZEN);
+    } else {
+        // kill drawing mode and attach
+        // mouse input to camera...
+        camera.attachControl(canvas, true);
+        eventBus.dispatch(EVENTS.CAMERA_UNFROZEN);
+    }
 });
 
 
 // debug if enabled
-eventBus.subscribe(EVENTS.GUI_DEBUG, payload=> {  
-  if(scene.debugLayer.isVisible()) {
-    scene.debugLayer.hide();
-  } else {
-    scene.debugLayer.show();  
-  };
-  
+eventBus.subscribe(EVENTS.GUI_DEBUG, payload => {
+    if (scene.debugLayer.isVisible()) {
+        scene.debugLayer.hide();
+    } else {
+        scene.debugLayer.show();
+    };
+
 })
 
 
 // listen for mouse right click, but if
 // only we're in string line mode .... 
 canvas.addEventListener("contextmenu", (evt) => {
-  if (!getCameraActive()) {
-    let picked = scene.pick(scene.pointerX, scene.pointerY);
+    if (!getCameraActive()) {
+        let picked = scene.pick(scene.pointerX, scene.pointerY);
 
-    if (picked.pickedMesh && picked.pickedMesh.name.substring(0, 4) == "post") {
-      outline.delFencePostByName(picked.pickedMesh.name)
-    } else {
-      outline.addFencePost(picked.pickedPoint);
+        if (picked.pickedMesh && picked.pickedMesh.name.substring(0, 4) == "post") {
+            outline.delFencePostByName(picked.pickedMesh.name)
+        } else {
+            outline.addFencePost(picked.pickedPoint);
+        }
     }
-  }
 });
+
+
+// listen for double click, focus the camera
+canvas.addEventListener("dblclick", function (e) {
+    if (getCameraActive()) {
+        let picked = scene.pick(scene.pointerX, scene.pointerY);
+        animateCameraTo(
+            picked.pickedPoint.x, // targetx
+            picked.pickedPoint.y,
+            picked.pickedPoint.z, //
+            camera.position.x,            
+            5, // location y
+            camera.position.z,            
+            5, // spped
+            2) // framecount
+    }
+})
+
+// animation function adapted from 
+// https://www.html5gamedevs.com/topic/37992-animating-arcrotatecamera-settarget/
+function animateCameraTo(targetX, targetY, targetZ, locationX, locationY, locationZ, speed, frameCount) {
+
+    let ease = new CubicEase();
+    ease.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT);
+
+    let activCam = scene.activeCamera;
+
+    let cameraTarget = new Vector3(targetX + (Math.random() * (0.001 - 0.002) + 0.002), targetY, targetZ);
+
+    let cameraPosition = new Vector3(locationX, locationY, locationZ);
+
+    Animation.CreateAndStartAnimation('at4', activCam, 'position', speed, frameCount, activCam.position, cameraPosition, 0, ease);
+
+    Animation.CreateAndStartAnimation('at5', activCam, 'target', speed, frameCount, activCam.target, cameraTarget, 0, ease);
+};
+
+// Animation
+// Vector3
+// CubicEase
 
 
 
@@ -188,80 +252,82 @@ canvas.addEventListener("contextmenu", (evt) => {
 
 // the canvas/window resize event handler
 window.addEventListener("resize", function () {
-  engine.resize();
+    engine.resize();
 });
 
 function drawGui() {
 
-  $(".button-container").remove();
+    $(".button-container").remove();
 
-  $("body").append('<div class="button-container">Garden Designer! </div>');
+    $("body").append('<div class="button-container">Garden Designer! </div>');
 
-  let cam_default = "Camera Mode";
-  button("btnDebug", "debug")
-  button("btnFreezeCamera", cam_default);
-  button("btnPolygon", "Polygon");
-  button("btnClear", "Clear");
-  button("btnLength", "Lengths");
-  button("btnKeep", "Keep");
-  button("btnBounding", "Bounding Box");
-  button("btnTube", "Tube");
-  button("btnFence", "Fence");
-  rangeSlider("rngHeight", "height", 0, 4, .1);
+    let cam_default = "Camera Mode";
+    button("btnDebug", "debug")
+    button("btnFreezeCamera", cam_default);
+    button("btnPolygon", "Polygon");
+    button("btnClear", "Clear");
+    button("btnLength", "Lengths");
+    button("btnKeep", "Keep");
+    button("btnBounding", "Bounding Box");
+    button("btnTube", "Tube");
+    button("btnFence", "Fence");
+    rangeSlider("rngHeight", "height", 0, 4, .1);
 
-  $("#rngHeight").on('change', function (ev) {
-    this.text = "freddo "
-  })
+    $("#rngHeight").on('change', function (ev) {
+        this.text = "freddo "
+    })
 
-  $("#btnFence").on('click', ev => {
-    var height = $("#rngHeight").val();
-    eventBus.dispatch(EVENTS.GUI_FENCE, { height: height });
-  })
+    $("#btnFence").on('click', ev => {
+        var height = $("#rngHeight").val();
+        eventBus.dispatch(EVENTS.GUI_FENCE, {
+            height: height
+        });
+    })
 
 
-  $("#btnTube").on('click', event => {
-    eventBus.dispatch(EVENTS.GUI_TUBE);
-  });
+    $("#btnTube").on('click', event => {
+        eventBus.dispatch(EVENTS.GUI_TUBE);
+    });
 
-  $("#btnBounding").on('click', (event) => {
-    eventBus.dispatch(EVENTS.GUI_BOUNDING);
-  })
+    $("#btnBounding").on('click', (event) => {
+        eventBus.dispatch(EVENTS.GUI_BOUNDING);
+    })
 
-  // freeze camera button
-  $("#btnFreezeCamera").on('click', (event) => {
-    eventBus.dispatch(EVENTS.GUI_CAMERA_FREEZE_TOGGLE);
-  });
+    // freeze camera button
+    $("#btnFreezeCamera").on('click', (event) => {
+        eventBus.dispatch(EVENTS.GUI_CAMERA_FREEZE_TOGGLE);
+    });
 
-  $("#btnPolygon").on('click', (event) => {
-    eventBus.dispatch(EVENTS.GUI_POLYGON);
-  });
+    $("#btnPolygon").on('click', (event) => {
+        eventBus.dispatch(EVENTS.GUI_POLYGON);
+    });
 
-  $("#btnClear").on('click', (event) => {
-    eventBus.dispatch(EVENTS.GUI_CLEAR);
-  });
+    $("#btnClear").on('click', (event) => {
+        eventBus.dispatch(EVENTS.GUI_CLEAR);
+    });
 
-  $("#btnLength").on('click', (event) => {
-    eventBus.dispatch(EVENTS.GUI_LENGTH_BUTTON)
-  });
+    $("#btnLength").on('click', (event) => {
+        eventBus.dispatch(EVENTS.GUI_LENGTH_BUTTON)
+    });
 
-  $("#btnKeep").on('click', (event) => {
-    eventBus.dispatch(EVENTS.GUI_KEEP);
-  });
+    $("#btnKeep").on('click', (event) => {
+        eventBus.dispatch(EVENTS.GUI_KEEP);
+    });
 
-  $("#btnDebug").on('click', ev=>{    
-    eventBus.dispatch(EVENTS.GUI_DEBUG)
-  })
+    $("#btnDebug").on('click', ev => {
+        eventBus.dispatch(EVENTS.GUI_DEBUG)
+    })
 
-  // change icon when camera is frozen
-  eventBus.subscribe(EVENTS.CAMERA_FROZEN, (payload) => {
-    $("#btnFreezeCamera").text("Draw Mode");
-    console.log("Draw Mode: Use the mouse to draw the outline of your garden")
-  });
+    // change icon when camera is frozen
+    eventBus.subscribe(EVENTS.CAMERA_FROZEN, (payload) => {
+        $("#btnFreezeCamera").text("Draw Mode");
+        console.log("Draw Mode: Use the mouse to draw the outline of your garden")
+    });
 
-  eventBus.subscribe(EVENTS.CAMERA_UNFROZEN, (payload) => {
-    $("#btnFreezeCamera").text(cam_default);
-    console.log("Camera Mode: use the mouse to move the camera around the scene")
-  });
+    eventBus.subscribe(EVENTS.CAMERA_UNFROZEN, (payload) => {
+        $("#btnFreezeCamera").text(cam_default);
+        console.log("Camera Mode: use the mouse to move the camera around the scene")
+    });
 }
 
 

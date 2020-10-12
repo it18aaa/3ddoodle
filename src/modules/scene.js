@@ -12,9 +12,8 @@ import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator"
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-
-import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 
 export const createCamera = function (canvas, scene) {
   // Create a FreeCamera, and set its position to (x:0, y:5, z:-10).
@@ -51,7 +50,7 @@ export const createOutlineScene = function (engine) {
     scene
   );
 
-  light.intensity = 0.8;
+  light.intensity = 0.9;
 
 
   // create a built in ground shape
@@ -82,9 +81,10 @@ export const createOutlineScene = function (engine) {
 
   const fenceMat = new StandardMaterial("fence", scene);
   fenceMat.diffuseTexture = new Texture("/img/fence1.png");
-  fenceMat.diffuseTexture.uScale = 3;
-  fenceMat.diffuseTexture.vScale = 2;
+  fenceMat.diffuseTexture.uScale = 1;
+  fenceMat.diffuseTexture.vScale = 1;
   fenceMat.diffuseTexture.hasAlpha = true;
+  fenceMat.backFaceCulling = false;
 
   return scene;
 }
