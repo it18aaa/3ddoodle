@@ -5,7 +5,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 module.exports = {
     mode: 'development',
-    devtools: 'source-maps',
+    devtool: 'source-maps',
     entry: "./src/drawoutline.js",
     output: {
         filename: "main.js",

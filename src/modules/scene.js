@@ -42,7 +42,7 @@ export const createOutlineScene = function (engine) {
   const scene = new Scene(engine);
 
   // scene.clearColor = new Color3(0.7, 0.85, 1);
-  scene.clearColor = new Color3(0.8, 0.9, 1);
+  scene.clearColor = new Color3(1,1,1);
 
   const light = new HemisphericLight(
     "hemiLight",
@@ -66,8 +66,8 @@ export const createOutlineScene = function (engine) {
 
   const gridMaterial = new GridMaterial("gridMaterial", scene);
   gridMaterial.mainColor = new Color3(0.94, 0.94, 0.94);
-  gridMaterial.lineColor = new Color3(0,0,0);
-  gridMaterial.minorUnitVisibility = .65;
+  gridMaterial.lineColor = new Color3(0.4,0.4,0.4);
+  gridMaterial.minorUnitVisibility = .55;
   gridMaterial.majorUnitFrequency = 5;
   gridMaterial.opacity = 0.9;
 

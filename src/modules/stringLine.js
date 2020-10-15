@@ -3,7 +3,7 @@ import "@babylonjs/core/Meshes/meshBuilder";
 import { PointerDragBehavior } from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder/";
-import { Color3 } from "babylonjs";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 // import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
