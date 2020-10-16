@@ -41,8 +41,10 @@ export const createCamera = function (canvas, scene) {
 export const createOutlineScene = function (engine) {
   const scene = new Scene(engine);
 
-  // scene.clearColor = new Color3(0.7, 0.85, 1);
-  scene.clearColor = new Color3(1,1,1);
+//  scene.clearColor = new Color3(0.7, 0.85, 1);
+  //scene.clearColor = new Color3(1,1,1);
+
+  scene.clearColor = new Color3(0.8, 0.94, 1);
 
   const light = new HemisphericLight(
     "hemiLight",

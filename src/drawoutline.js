@@ -6,6 +6,13 @@
 // import "@babylonjs/core/Loading/loadingScreen";
 // import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 // import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRenderer";
+
+// required to polyfill async/await stuff in classes
+// for browsers
+import "core-js";
+import "regenerator-runtime/runtime";
+
+
 import {
     Vector3
 } from "@babylonjs/core/Maths/math";
@@ -68,10 +75,16 @@ const engine = new Engine(canvas, true, {
     stencil: true,
 });
 
+// init the scene
 const scene = createOutlineScene(engine);
+// create user interface texture
 const adt = new AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 const camera = createCamera(canvas, scene);
 var counter = 0;
+
+
+var a = new Dialog('dlgFence', 'Add a fence', eventBus);
+var b = new Dialog('dlgGroud', 'Add material', eventBus);
 
 // attach camera to scene to start off with...
 camera.attachControl(canvas, false);
@@ -299,11 +312,11 @@ function drawGui() {
     // example of button with built in call back
     button2("btnBiff", "biff", eventBus, () => {
         console.log("Biff pressed");
+        a.show();
         eventBus.dispatch(EVENTS.GUI_FENCE, { height: 5 })
-    }, "stuff");
+    }, "button-container");
 
-    var a = new Dialog('dlgScooby', 'scooby dooby doo!');
-    var b = new Dialog('ba', 'wilburforce zed!');
+    
 
 
     rangeSlider("rngHeight", "height", 0, 4, .1);
