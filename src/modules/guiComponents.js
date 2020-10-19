@@ -1,5 +1,6 @@
-import { EVENTS } from "./eventBus";
+import { EVENTS } from "./constants";
 import $ from "jquery";
+
 
 export function button(id, text, container = "button-container") {
     $(`.${container}`).append(`<button id='${id}'>${text}</button>`);
@@ -13,11 +14,11 @@ export function button2(id, text, event, callback, container = "button-container
     $(`#${id}`).on('click', callback);
 }
 
-
 export function getButton(id, text) {
     return `<button id='${id}'>${text}</button>`;
 }
 
+// TODO: remove hardcoded styles...
 export function getTextField(id, label, def = "") {
     let output = `<div style='border: 1px solid grey'>`;
     output += `${label}: <br />`;
@@ -26,33 +27,55 @@ export function getTextField(id, label, def = "") {
     return output;
 }
 
-
 export class Dialog {
+    static count = 0;
+    static fadeInTime = 400;
     title;
     id;
     hidden = true;  // all modals are hidden to begin with
+    content;
     bus;
     buttonCancelId;
     buttonOkayId;
 
     constructor(id, title, eventBus) {
-        console.log("inside the constructor of dialog!")
         this.bus = eventBus;
         this.id = id;
-
         this.buttonOkayId = `btn${id}-OKAY`;
         this.buttonCancelId = `btn${id}-CANCEL`
         this.title = title ? title : "blank dialog!";
-
         this.render();
+
+        // init static variable if not defined
+        if (Dialog.getVisibleCount() == undefined) {
+            Dialog.setVisibleCount(0);
+        }
+    }
+
+    // override this method to add content
+    contents() {
+        return; /// return the insides of the dialog box
+    }
+
+    // override this method to wire up call backs, if needed
+    callbacks() {
+        return;
     }
 
     render() {
         var output;
         output = `<div class='modal' id='${this.id}'>`;
-        output += `<h1>${this.title}</h1>`;
-        output += `<div id='${this.id}-button-container'>`;
-        output += getTextField(`${this.id}-height`, 'Height');
+        output += `<div class='modal-title'>${this.title}</div>`;
+
+        // render content here.... 
+        output += `<div class='modal-content'>`;
+        if (this.contents()) {
+            output += this.contents();
+        }
+        output += `</div>`;
+
+        output += `<div id='${this.id}-button-container'
+        style='text-align: right'>`;
         output += getButton(`${this.buttonOkayId}`, 'Okay');
         output += getButton(`${this.buttonCancelId}`, 'Cancel');
         output += `</div>`;
@@ -69,29 +92,56 @@ export class Dialog {
         $(`#${this.buttonCancelId}`).on('click', () => {
             this.cancel();
         })
+
+        // wire up any other call backs
+        this.callbacks();
+    }
+
+    // static methods to martial dialog modality
+
+    static getVisibleCount() {
+        return Dialog.count;
+    }
+
+    static setVisibleCount(num) {
+        if (Number.isInteger(num)) {
+            Dialog.count = num;
+        }
     }
 
     show() {
-        $(`#${this.id}`).fadeIn(200);
+        // if there are no dialogs open already
+        // and this dialog is hidden
+        if (Dialog.getVisibleCount() == 0 && this.hidden == true) {
+            $(`#${this.id}`).fadeIn(Dialog.fadeInTime);
+            Dialog.setVisibleCount(Dialog.getVisibleCount() + 1);
+            this.hidden = false;
+        } else {
+            // DEBUG
+            // console.log("dialog already open!", Dialog.getVisibleCount())
+        }
     }
 
     hide() {
-        $(`#${this.id}`).fadeOut(200);
+        // if this dialog is not hidden, then hide it
+        if (this.hidden == false) {
+            $(`#${this.id}`).fadeOut(Dialog.fadeInTime);
+            Dialog.setVisibleCount(Dialog.getVisibleCount() - 1);
+            this.hidden = true;
+        }
     }
 
+    // override this to perform a different action
     accept() {
-        // wire up the accept call back
-        // send dialog accept onto event bus along with
-        // form values as payload :-)
+        
         // hide the form
         this.bus.dispatch(EVENTS.GUI_DIALOG_ACCEPT,
             {
                 type: "FORMDATA",
-                height: 1.4, 
+                height: 1.4,
             });
         this.resetForm();
         this.hide();
-
     }
 
     cancel() {
@@ -105,12 +155,52 @@ export class Dialog {
         this.resetForm();
         this.hide();
     }
-
     resetForm() {
+        // method to override
+        // fill out form fields
 
     }
 }
 
+export class CameraOptionsDialog extends Dialog {
+    
+    oid = '';
+    pid =  '';
+    constructor(id, title, eventBus) {             
+        super(id, title, eventBus);    
+        
+        // // this doesn't work in here, needs to be called from elsewhere
+        // this.oid = `btn${this.id}ortho`;
+        // this.pid = `btn${this.id}persp`;      
+
+    }    
+
+    contents() {
+        var content;
+        // this.boo();
+        this.oid = `btn${this.id}ortho`;
+        this.pid = `btn${this.id}persp`;
+
+        // console.log("contents this", this)
+        content += `Change View type<br />`;
+        content += getButton(this.pid, 'Perspective View');
+        content += getButton(this.oid, 'Orthographic View');
+                        
+        return content;
+    }
+
+    callbacks() {
+        $(`#${this.oid}`).on('click', ()=> {            
+            this.bus.dispatch(EVENTS.GUI_CAMERA_ORTHO)
+        })
+
+        $(`#${this.pid}`).on('click', ()=> {                        
+            this.bus.dispatch(EVENTS.GUI_CAMERA_PERSPECTIVE)
+        })
+    }
+}
+
+// TODO: this isn't very good, needs refactoring
 export function rangeSlider(
     id,
     text,

@@ -14,7 +14,7 @@ module.exports = {
     optimization: {
         // usedExports: true,
         // minimize: true,
-        // minimizer: [new UglifyJsPlugin()]
+        minimizer: [new UglifyJsPlugin()]
     },
     // plugins: [
     //     new BundleAnalyzerPlugin()

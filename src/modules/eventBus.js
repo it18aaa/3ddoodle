@@ -1,26 +1,4 @@
-export const EVENTS = Object.freeze({
-    GUI_CLICK_MODE_DRAG: Symbol("GUI_CLICK_MODE_DRAG"),
-    GUI_CLICK_MODE_DRAW: Symbol("GUI_CLICK_MODE_DRAW"),
-    GUI_CLICK_MODE_CREATE: Symbol("GUI_CLICK_MODE_CREATE"),
-    GUI_CLICK_SELECTED_UP: Symbol("GUI_CLICK_SELECTED_UP"),
-    GUI_CLICK_SELECTED_DOWN: Symbol("GUI_CLICK_SELECTED_DOWN"),
-    MOUSE_MESH_SELECTED: Symbol("MOUSE_MESH_SELECTED"),
-    MOUSE_MESH_UNSELECTED: Symbol("MOUSE_MESH_UNSELECTED"),
-    MOUSE_MESH_DRAG_END: Symbol("MOUSE_MESH_DRAG_END"),
-    GUI_CAMERA_FREEZE_TOGGLE: Symbol("GUI_CAMERA_FREEZE_TOGGLE"),
-    CAMERA_FROZEN: Symbol("CAMERA_FROZEN"),
-    CAMERA_UNFROZEN: Symbol("CAMERA_UNFROZEN"),
-    GUI_POLYGON: Symbol("GUI_POLYGON"), 
-    GUI_CLEAR: Symbol("GUI_CLEAR"),
-    GUI_LENGTH_BUTTON: Symbol("GUI_LENGTH_BUTTON"),
-    GUI_BOUNDING: Symbol("GUI_BOUNDING"),
-    GUI_TUBE: Symbol("GUI_TUBE"),
-    GUI_FENCE: Symbol("GUI_FENCE"),
-    GUI_DEBUG: Symbol("GUI_DEBUG"),
-    GUI_CAMERA_ORTHO: Symbol("GUI_CAMERA_ORTHO"),
-    GUI_CAMERA_PERSPECTIVE: Symbol("GUI_CAMERA_PERSPECTIVE"),
-    GUI_DIALOG_ACCEPT: Symbol("GUI_DIALOG_ACCEPT")
-});
+
 
 export class EventBus {
     #lastSubscriberID = 0; // likewise increment for     
@@ -34,9 +12,7 @@ export class EventBus {
             this.#subscribers[type] = {};
         }
  
-        this.#subscribers[type][id] = callback;
-
-        console.log("registered new callback for ", type, id);
+        this.#subscribers[type][id] = callback;        
         this.#lastSubscriberID = id;
 
         return id;
@@ -45,6 +21,7 @@ export class EventBus {
     unsubscribe(id) {
         // look through the array for the callback id
         // then remove it        
+        // is this required?
     }
 
     dispatch(type, payload) {
@@ -55,6 +32,5 @@ export class EventBus {
         } 
              Object.keys(this.#subscribers[type])
                  .forEach(id => this.#subscribers[type][id](payload));
-
         }
     }
