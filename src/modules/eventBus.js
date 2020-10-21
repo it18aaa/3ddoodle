@@ -21,7 +21,7 @@ export class EventBus {
     unsubscribe(id) {
         // look through the array for the callback id
         // then remove it        
-        // is this required?
+        // not yet implemented as not sure required?
     }
 
     dispatch(type, payload) {

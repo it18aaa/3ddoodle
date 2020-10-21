@@ -13,6 +13,7 @@ import "core-js";
 import "regenerator-runtime/runtime";
 
 import {
+    Color3,
     Vector3
 } from "@babylonjs/core/Maths/math";
 import {
@@ -73,6 +74,7 @@ import {
 // DEBUG STUFF
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 // TODO:  lots of globals here need to be tidied up.
 
@@ -92,6 +94,14 @@ const camera = createCamera(canvas, scene);
 // this counter is for mesh naming 
 // TODO: move out of global name space
 var counter = 0;
+
+// dirty hack to prevent overlapping material messs
+var groundLevel = 0.001;
+function incrementGroundLevel() {
+    groundLevel = groundLevel + 0.001;
+}
+
+
 
 // attach camera to scene to start off with...
 camera.attachControl(canvas, false);
@@ -120,9 +130,29 @@ function getCameraActive() {
     return camera.inputs.attachedElement ? true : false;
 }
 
-// CREATE POLYGON BUTTON
+// LEgacy
 eventBus.subscribe(EVENTS.GUI_POLYGON, data => {
+   createPolygon(outline, scene, new Color3.Green());
+})
 
+// CREATE POLYGON BUTTON
+eventBus.subscribe(EVENTS.CREATE_GRASS, data => {
+    createPolygon(outline, scene, new Color3(0.2,0.6,0.2));
+ })
+ 
+ // CREATE POLYGON BUTTON
+eventBus.subscribe(EVENTS.CREATE_PATIO, data => {
+    createPolygon(outline, scene, new Color3.Gray());
+})
+
+// CREATE POLYGON BUTTON
+eventBus.subscribe(EVENTS.CREATE_BORDER, data => {
+    createPolygon(outline, scene, new Color3(0.2,0.2,0));
+})
+
+
+
+function createPolygon(outline, scene, color) {
     if (outline.getLines().length > 2) {
         const corners = [];
         outline.getLines().forEach((line) => {
@@ -130,17 +160,23 @@ eventBus.subscribe(EVENTS.GUI_POLYGON, data => {
         });
 
         const polygon_triangulation = new PolygonMeshBuilder(
-            "biff",
+            "TODO_CREATE_NAME",
             corners,
             scene,
             EarcutRef
         );
 
         const polygon = polygon_triangulation.build(false);
-        polygon.position.y = 0.001;
-    }
+        polygon.position.y = groundLevel;
+        incrementGroundLevel();
 
-})
+        // polygon.material = scene.getMaterialByName("fence");
+        const material = new StandardMaterial("name-material", scene);
+        material.diffuseColor = color;
+        polygon.material = material;
+    }
+}
+
 
 // CLEAR BUTTON
 eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
@@ -173,30 +209,63 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {
 
 // GET LENGTHS BUTTON 
 eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, payload => {
-    // let lengths = outline.getLengths();
-
-    // var classType = outline.constructor.name;
-
-    // console.log("classtype: ", outline.constructor.name);
-    // console.log("super: ", outline);
-    // console.log(lengths)
-    // console.log(`total length: `, outline.totalLength)
-
     eventBus.dispatch(EVENTS.GUI_LENGTHS_INFO, {
         lengths: outline.getLengths(),
         total: outline.totalLength
     })
-
 })
-
 
 eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
     outline.updateExtents();
 })
 
 
+function createFence(outline, data, colour) {
+    const f = new RibbonFence(outline);
+    f.doubledOver = true;
+
+    if (data.height && data.height > 0.01 && data.height < 10) {
+        f.height = data.height;
+    }
+    const mesh = f.getMesh();
+
+    counter++;
+    mesh.name = `fence${counter}`;
+
+    var mat = new StandardMaterial("new mat", scene);
+    mat.diffuseColor = colour;
+    mesh.material = mat;
+
+    scene.addMesh(mesh);
+}
+
 // FENCE - currently making a fence!
-eventBus.subscribe(EVENTS.GUI_FENCE, payload => {
+eventBus.subscribe(EVENTS.GUI_FENCE, data => {
+   createFence(outline, data, new Color3(0.3, 0.2, 0));
+    // mesh.material = scene.getMaterialByName("woodFence");
+    // mesh.material = scene.getMaterialByName("fence");
+})
+
+eventBus.subscribe(EVENTS.GUI_WHITE_FENCE, data => {
+    createFence(outline, data, new Color3(1, 1, 1));
+ })
+
+ // FENCE - currently making a fence!
+eventBus.subscribe(EVENTS.GUI_LIGHT_FENCE, data => {
+    createFence(outline, data, new Color3(0.7, 0.5, 0.3));     
+ })
+
+ eventBus.subscribe(EVENTS.GUI_BLUE_FENCE, data => {
+    createFence(outline, data, new Color3(0.0, 0.4, 0.6));     
+ })
+
+
+ 
+ 
+
+
+
+eventBus.subscribe(EVENTS.GUI_TEXTURE_FENCE, payload => {
     const f = new RibbonFence(outline);
 
     if (payload.height && payload.height > 0.1 && payload.height < 10) {
@@ -211,6 +280,7 @@ eventBus.subscribe(EVENTS.GUI_FENCE, payload => {
     // mesh.material = scene.getMaterialByName("woodFence");
     mesh.material = scene.getMaterialByName("fence");
 })
+
 
 // CAMERA mode toggle button
 eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
