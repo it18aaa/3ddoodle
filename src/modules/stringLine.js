@@ -1,15 +1,32 @@
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Meshes/meshBuilder";
-import { PointerDragBehavior } from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
-import { Vector3 } from "@babylonjs/core/Maths/math";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder/";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import {
+    PointerDragBehavior
+} from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
+import {
+    Vector3
+} from "@babylonjs/core/Maths/math";
+import {
+    MeshBuilder
+} from "@babylonjs/core/Meshes/meshBuilder/";
+import {
+    Color3
+} from "@babylonjs/core/Maths/math.color";
+import {
+    StandardMaterial
+} from "@babylonjs/core/Materials/standardMaterial";
+import {
+    TextBlock
+} from "@babylonjs/gui/2D/controls/textBlock";
 // import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 // import * as EarcutRef from "earcut";
 // import { Line } from "@babylonjs/gui";
-import { Measurement } from "./measurement"
+import {
+    Measurement
+} from "./measurement"
+import {
+    EVENTS
+} from "./constants";
 // import { Mesh } from "@babylonjs/core/Meshes";
 // import { mitredExtrude } from "./mitredExtrude";
 
@@ -22,13 +39,11 @@ export class StringLine {
     dragBehavior;
     linesMesh;
     totalLength;
+    bus;
 
     type;
     showLabels = true;
-    // measureX;
-    // measureY;
     isClosed = true;
-
 
     adt;
     dimensions = {
@@ -37,16 +52,17 @@ export class StringLine {
         diameterBottom: 0.02
     };
 
-    constructor(scene, adt, isClosed) {
+    constructor(scene, adt, isClosed, bus) {
+        
         this.scene = scene;
         this.postMaterial = new StandardMaterial("postMaterial", scene);
         this.postMaterial.diffuseColor = new Color3(1, .5, 0);
         this.adt = adt;
         this.isClosed = isClosed;
+        this.bus = bus;
 
         let mx = new Measurement(this.scene, this.adt, "x");
         let my = new Measurement(this.scene, this.adt, "y");
-
 
         mx.offset = .5;
         mx.height = 0.25;
@@ -170,6 +186,12 @@ export class StringLine {
             }
         }
         this.updateTotalLength();
+
+        this.bus.dispatch(EVENTS.STRINGLINE_LENGTHS_UPDATED, {
+            lengths: this.lengths,
+            total: this.totalLength,
+            extents: this.extents
+        })
     }
 
     // adds a fence post at position ....    
@@ -236,8 +258,7 @@ export class StringLine {
         }
 
         this.linesMesh = MeshBuilder.CreateLines(
-            "lines",
-            {
+            "lines", {
                 points: this.getLines(),
                 updatable: true,
             },

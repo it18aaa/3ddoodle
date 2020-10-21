@@ -12,10 +12,18 @@
 import "core-js";
 import "regenerator-runtime/runtime";
 
-import { Vector3 } from "@babylonjs/core/Maths/math";
-import { CubicEase } from "@babylonjs/core/Animations/easing";
-import { EasingFunction } from "@babylonjs/core/Animations/easing"
-import { Animation } from "@babylonjs/core/Animations/animation"
+import {
+    Vector3
+} from "@babylonjs/core/Maths/math";
+import {
+    CubicEase
+} from "@babylonjs/core/Animations/easing";
+import {
+    EasingFunction
+} from "@babylonjs/core/Animations/easing"
+import {
+    Animation
+} from "@babylonjs/core/Animations/animation"
 // import { Mesh } from "@babylonjs/core/Meshes/mesh"
 // import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 // import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -23,16 +31,43 @@ import { Animation } from "@babylonjs/core/Animations/animation"
 // import { VertexBuffer } from "@babylonjs/core/meshes"
 
 //import { PlaneRotationGizmo } from "@babylonjs/core/Gizmos/planeRotationGizmo";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import {
+    Vector2
+} from "@babylonjs/core/Maths/math";
+import {
+    PolygonMeshBuilder
+} from "@babylonjs/core/Meshes/polygonMesh";
+import * as EarcutRef from "earcut";
 
-import { createCamera, createOutlineScene } from "./modules/scene";
-import { StringLine } from "./modules/stringLine"
-import { RibbonFence } from "./modules/ribbonFence"
-import { EventBus } from "./modules/eventBus";
-import { EVENTS } from "./modules/constants";
-import { drawGui } from "./modules/drawGui";
+import {
+    Engine
+} from "@babylonjs/core/Engines/engine";
+import {
+    AdvancedDynamicTexture
+} from "@babylonjs/gui/2D/advancedDynamicTexture";
+import {
+    Camera
+} from "@babylonjs/core/Cameras/camera";
+
+import {
+    createCamera,
+    createOutlineScene
+} from "./modules/scene";
+import {
+    StringLine
+} from "./modules/stringLine"
+import {
+    RibbonFence
+} from "./modules/ribbonFence"
+import {
+    EventBus
+} from "./modules/eventBus";
+import {
+    EVENTS
+} from "./modules/constants";
+import {
+    drawGui
+} from "./modules/drawGui";
 
 
 // DEBUG STUFF
@@ -45,7 +80,9 @@ import "@babylonjs/inspector";
 const eventBus = new EventBus();
 
 const canvas = document.getElementById("renderCanvas");
-const engine = new Engine(canvas, true, { stencil: true });
+const engine = new Engine(canvas, true, {
+    stencil: true
+});
 const scene = createOutlineScene(engine);
 // create user interface texture
 const adt = new AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
@@ -65,7 +102,7 @@ var showfps = 1;
 
 // init the string-line, this is the principle tool for modifying our
 // garden 
-const outline = new StringLine(scene, adt, false)
+const outline = new StringLine(scene, adt, false, eventBus);
 
 drawGui(eventBus);
 
@@ -84,8 +121,25 @@ function getCameraActive() {
 }
 
 // CREATE POLYGON BUTTON
-eventBus.subscribe(EVENTS.GUI_POLYGON, (payload) => {
-    outline.getPolygonFromLines();
+eventBus.subscribe(EVENTS.GUI_POLYGON, data => {
+
+    if (outline.getLines().length > 2) {
+        const corners = [];
+        outline.getLines().forEach((line) => {
+            corners.push(new Vector2(line.x, line.z));
+        });
+
+        const polygon_triangulation = new PolygonMeshBuilder(
+            "biff",
+            corners,
+            scene,
+            EarcutRef
+        );
+
+        const polygon = polygon_triangulation.build(false);
+        polygon.position.y = 0.001;
+    }
+
 })
 
 // CLEAR BUTTON
@@ -118,15 +172,21 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {
 
 
 // GET LENGTHS BUTTON 
-eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, (payload) => {
-    let lengths = outline.getLengths();
+eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, payload => {
+    // let lengths = outline.getLengths();
 
-    var classType = outline.constructor.name;
+    // var classType = outline.constructor.name;
 
-    console.log("classtype: ", outline.constructor.name);
-    console.log("super: ", outline);
-    console.log(lengths)
-    console.log(`total length: `, outline.totalLength)
+    // console.log("classtype: ", outline.constructor.name);
+    // console.log("super: ", outline);
+    // console.log(lengths)
+    // console.log(`total length: `, outline.totalLength)
+
+    eventBus.dispatch(EVENTS.GUI_LENGTHS_INFO, {
+        lengths: outline.getLengths(),
+        total: outline.totalLength
+    })
+
 })
 
 
@@ -135,30 +195,14 @@ eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
 })
 
 
-// KEEP POLYGON BUTTON
-// eventBus.subscribe(EVENTS.GUI_KEEP, (payload) => {
-//     let p = outline.getPolygon();
-//     if (p) {
-//         scene.addMesh(p);
-//     }
-//     outline.reset();
-// })
-
-
-// TUBE!
-eventBus.subscribe(EVENTS.GUI_TUBE, payload => {
-    outline.getTubeFromLines();
-})
-
-
 // FENCE - currently making a fence!
 eventBus.subscribe(EVENTS.GUI_FENCE, payload => {
-    var f = new RibbonFence(outline);
+    const f = new RibbonFence(outline);
 
     if (payload.height && payload.height > 0.1 && payload.height < 10) {
         f.height = payload.height;
     }
-    var mesh = f.getMesh();
+    const mesh = f.getMesh();
 
     counter++;
     mesh.name = `fence${counter}`;
@@ -182,6 +226,18 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, (payload) => {
         camera.attachControl(canvas, true);
         eventBus.dispatch(EVENTS.CAMERA_UNFROZEN);
     }
+});
+
+// switch between camera mode and edit mode
+
+eventBus.subscribe(EVENTS.MODE_EDIT, payload => {
+    if (getCameraActive()) {
+        camera.detachControl(canvas);
+    }
+});
+
+eventBus.subscribe(EVENTS.MODE_CAMERA, payload => {
+    camera.attachControl(canvas, true);
 });
 
 
@@ -229,18 +285,12 @@ canvas.addEventListener("dblclick", function (e) {
 // animation function adapted from 
 // https://www.html5gamedevs.com/topic/37992-animating-arcrotatecamera-settarget/
 function animateCameraTo(targetX, targetY, targetZ, locationX, locationY, locationZ, speed, frameCount) {
-
     let ease = new CubicEase();
     ease.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT);
-
     let activCam = scene.activeCamera;
-
     let cameraTarget = new Vector3(targetX + (Math.random() * (0.001 - 0.002) + 0.002), targetY, targetZ);
-
     let cameraPosition = new Vector3(locationX, locationY, locationZ);
-
     Animation.CreateAndStartAnimation('at4', activCam, 'position', speed, frameCount, activCam.position, cameraPosition, 0, ease);
-
     Animation.CreateAndStartAnimation('at5', activCam, 'target', speed, frameCount, activCam.target, cameraTarget, 0, ease);
 };
 

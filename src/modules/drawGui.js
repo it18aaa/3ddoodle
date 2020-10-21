@@ -1,41 +1,73 @@
 'use strict';
 import { EVENTS } from './constants';
-import { Dialog, CameraOptionsDialog, button, button2, rangeSlider } from './guiComponents';
+import { button, button2, rangeSlider } from './guiComponents';
 import $ from 'jquery';
+import { Dialog } from './dialog';
+import { CameraOptionsDialog } from './cameraOptionsDialog';
+import { LengthsDialog } from './lengthsDialog';
 
-export function drawGui(eventBus) {
+export function drawGui(bus) {
 
     // namespace our dialogs
-    var dialogs = {};
-    dialogs.create = new Dialog('dlgCreate', 'Create an item', eventBus);
-    dialogs.cameraOptions = new CameraOptionsDialog('dlgCamera', 'Camera options', eventBus);
-    dialogs.other = new Dialog('dlgCamera', 'Other', eventBus);
+    const dialogs = {};
+
+    dialogs.create = new Dialog('dlgCreate', 'Create an item', bus);
+    dialogs.create.render();
+
+    dialogs.cameraOptions = new CameraOptionsDialog('dlgCamera', 'Camera options', bus);
+    dialogs.cameraOptions.render();
+
+    dialogs.other = new Dialog('dlgCamera', 'Other', bus);
+    dialogs.other.render();
+
+    dialogs.lengths = new LengthsDialog('dlgLengths', 'Measurements', bus);
+    dialogs.lengths.render();
+
+    // Object.entries(dialogs).forEach(obj=>{ obj.render() });
 
     $(".button-container").remove();
 
     $("body").append('<div class="button-container">Garden Designer! </div>');
 
-    let cam_default = "Camera Mode";
-
+    
     button("btnDebug", "debug")
-    button("btnFreezeCamera", cam_default);
+    
     button("btnPolygon", "Polygon");
     button("btnClear", "Clear");
-    button("btnLength", "Lengths");
-    button("btnKeep", "Keep");
-    button("btnBounding", "Bounding Box");
-    button("btnTube", "Tube");
     
-    button("btnCameraPerspective", "Perspective");
-    button("btnCameraOrtho", "Orthographic");
+    // lengths button
+    button2("btnLength", "Measurements", bus, ()=> {
+        bus.dispatch(EVENTS.GUI_LENGTH_BUTTON);
+    })
 
-    // create button with callback built in.
-    button2("btnCreate", "Create", eventBus, () => {
+    // listen for the lengths
+    bus.subscribe(EVENTS.GUI_LENGTHS_INFO, payload=>{
+        console.log("Lengths payload", payload)
+        // update the lengths dialog with payload...
+        dialogs.lengths.update(payload);
+        dialogs.lengths.show();
+    })
+
+    bus.subscribe(EVENTS.STRINGLINE_LENGTHS_UPDATED, data=> {
+        if(data.lengths.length>0) {
+            dialogs.lengths.update(data);
+        }
+        
+    })
+
+    button2("btnModeEdit", "Edit Mode", bus, ()=>{
+        bus.dispatch(EVENTS.MODE_EDIT);
+    });
+    
+    button2("btnModeCamera", "Camera Mode", bus, ()=>{
+        bus.dispatch(EVENTS.MODE_CAMERA);
+    });
+
+    button2("btnCreate", "Create", bus, () => {
         dialogs.create.show();        
     }, "button-container");
 
-    // camera options button with callback 
-    button2("btnCameraOptions", "Camera Options", eventBus, () => {
+   button2("btnCameraOptions", "Camera Options", bus, () => {
         dialogs.cameraOptions.show();        
     }, "button-container");
 
@@ -50,62 +82,41 @@ export function drawGui(eventBus) {
     button("btnFence", "Fence");
     $("#btnFence").on('click', ev => {
         var height = $("#rngHeight").val();
-        eventBus.dispatch(EVENTS.GUI_FENCE, {
+        bus.dispatch(EVENTS.GUI_FENCE, {
             height: height
         });
     })
 
-    $("#btnCameraPerspective").on('click', event => {
-        eventBus.dispatch(EVENTS.GUI_CAMERA_PERSPECTIVE);
-    })
-
-    $("#btnCameraOrtho").on('click', event => {
-        eventBus.dispatch(EVENTS.GUI_CAMERA_ORTHO);
-    })
-
-
-    $("#btnTube").on('click', event => {
-        eventBus.dispatch(EVENTS.GUI_TUBE);
-    });
 
     $("#btnBounding").on('click', (event) => {
-        eventBus.dispatch(EVENTS.GUI_BOUNDING);
+        bus.dispatch(EVENTS.GUI_BOUNDING);
     })
 
-    // freeze camera button
-    $("#btnFreezeCamera").on('click', (event) => {
-        eventBus.dispatch(EVENTS.GUI_CAMERA_FREEZE_TOGGLE);
-    });
+    // // freeze camera button
+    // $("#btnFreezeCamera").on('click', (event) => {
+    //     eventBus.dispatch(EVENTS.GUI_CAMERA_FREEZE_TOGGLE);
+    // });
 
     $("#btnPolygon").on('click', (event) => {
-        eventBus.dispatch(EVENTS.GUI_POLYGON);
+        bus.dispatch(EVENTS.GUI_POLYGON);
     });
 
     $("#btnClear").on('click', (event) => {
-        eventBus.dispatch(EVENTS.GUI_CLEAR);
+        bus.dispatch(EVENTS.GUI_CLEAR);
     });
 
-    $("#btnLength").on('click', (event) => {
-        eventBus.dispatch(EVENTS.GUI_LENGTH_BUTTON)
-    });
+    // $("#btnLength").on('click', (event) => {
+    //     bus.dispatch(EVENTS.GUI_LENGTH_BUTTON)
+    // });
 
     $("#btnKeep").on('click', (event) => {
-        eventBus.dispatch(EVENTS.GUI_KEEP);
+        bus.dispatch(EVENTS.GUI_KEEP);
     });
 
     $("#btnDebug").on('click', ev => {
-        eventBus.dispatch(EVENTS.GUI_DEBUG)
+        bus.dispatch(EVENTS.GUI_DEBUG)
     })
 
-    // change icon when camera is frozen
-    eventBus.subscribe(EVENTS.CAMERA_FROZEN, (payload) => {
-        $("#btnFreezeCamera").text("Draw Mode");
-        console.log("Draw Mode: Use the mouse to draw the outline of your garden")
-    });
-
-    eventBus.subscribe(EVENTS.CAMERA_UNFROZEN, (payload) => {
-        $("#btnFreezeCamera").text(cam_default);
-        console.log("Camera Mode: use the mouse to move the camera around the scene")
-    });
+    
 }
 
