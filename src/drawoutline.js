@@ -130,29 +130,23 @@ function getCameraActive() {
     return camera.inputs.attachedElement ? true : false;
 }
 
-// LEgacy
-eventBus.subscribe(EVENTS.GUI_POLYGON, data => {
-   createPolygon(outline, scene, new Color3.Green());
-})
 
-// CREATE POLYGON BUTTON
 eventBus.subscribe(EVENTS.CREATE_GRASS, data => {
-    createPolygon(outline, scene, new Color3(0.2,0.6,0.2));
- })
+    createPolygon(outline, scene, new Color3(0.2,0.6,0.2), "grassMaterial");
+ });
  
- // CREATE POLYGON BUTTON
 eventBus.subscribe(EVENTS.CREATE_PATIO, data => {
     createPolygon(outline, scene, new Color3.Gray());
-})
+});
 
-// CREATE POLYGON BUTTON
 eventBus.subscribe(EVENTS.CREATE_BORDER, data => {
     createPolygon(outline, scene, new Color3(0.2,0.2,0));
-})
+});
 
 
+function createPolygon(outline, scene, color, texture) {
 
-function createPolygon(outline, scene, color) {
+
     if (outline.getLines().length > 2) {
         const corners = [];
         outline.getLines().forEach((line) => {
@@ -172,9 +166,14 @@ function createPolygon(outline, scene, color) {
         incrementGroundLevel();
 
         // polygon.material = scene.getMaterialByName("fence");
-        const material = new StandardMaterial("name-material", scene);
-        material.diffuseColor = color;
-        polygon.material = material;
+        if(texture) {
+            polygon.material = scene.getMaterialByName(texture)
+        } else {
+            const material = new StandardMaterial("name-material", scene);
+            material.diffuseColor = color;
+            polygon.material = material;
+        }
+        
     }
 }
 
@@ -198,11 +197,10 @@ eventBus.subscribe(EVENTS.GUI_CAMERA_ORTHO, (payload) => {
     }
 
     function setOrthoMode(distance) {
-        var aspect = scene.getEngine().getRenderingCanvasClientRect().height / scene.getEngine().getRenderingCanvasClientRect().width;
-        distance = 
+        var aspect = scene.getEngine().getRenderingCanvasClientRect().height 
+                / scene.getEngine().getRenderingCanvasClientRect().width;
         camera.orthoLeft = -distance / 3;
         camera.orthoRight = distance / 3;
-
         camera.orthoBottom = camera.orthoLeft * aspect;
         camera.orthoTop = camera.orthoRight * aspect;        
     }
@@ -232,22 +230,16 @@ eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, payload => {
 eventBus.subscribe(EVENTS.GUI_CAMERA_OPTIONS, ()=> {
     // get camera details to send back to gui
     let data = {};
-
     data.mode = camera.mode;
-    
     if (data.mode == Camera.PERSPECTIVE_CAMERA) {
         data.fov = camera.fov;
     } else {
        data.distance = camera.orthoRight * 3;
     }
-
     data.aspect = scene.getEngine().getRenderingCanvasClientRect().height 
                 / scene.getEngine().getRenderingCanvasClientRect().width;
-
-
     eventBus.dispatch(EVENTS.CAMERA_INFO, data);
 })
-
 
 eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
     outline.updateExtents();
@@ -412,21 +404,21 @@ window.addEventListener("resize", function () {
 // so that the same texture can be used on multiple
 // meshes... 
 
-// function setUVScale(mesh, uScale, vScale) {
-//   var i,
-//     UVs = mesh.getVerticesData(VertexBuffer.UVKind),
-//     len = UVs.length;
+function setUVScale(mesh, uScale, vScale) {
+  var i,
+    UVs = mesh.getVerticesData(VertexBuffer.UVKind),
+    len = UVs.length;
 
-//   if (uScale !== 1) {
-//     for (i = 0; i < len; i += 2) {
-//       UVs[i] *= uScale;
-//     }
-//   }
-//   if (vScale !== 1) {
-//     for (i = 1; i < len; i += 2) {
-//       UVs[i] *= vScale;
-//     }
-//   }
+  if (uScale !== 1) {
+    for (i = 0; i < len; i += 2) {
+      UVs[i] *= uScale;
+    }
+  }
+  if (vScale !== 1) {
+    for (i = 1; i < len; i += 2) {
+      UVs[i] *= vScale;
+    }
+  }
 
-//   mesh.setVerticesData(VertexBuffer.UVKind, UVs);
-// }
+  mesh.setVerticesData(VertexBuffer.UVKind, UVs);
+}

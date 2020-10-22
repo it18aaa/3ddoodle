@@ -1,9 +1,16 @@
-
-import { Dialog } from './dialog';
-import { EVENTS } from "./constants";
-import { getButton } from "./guiComponents"
+import {
+    Dialog
+} from './dialog';
+import {
+    EVENTS
+} from "./constants";
+import {
+    getButton
+} from "./guiComponents"
 import $ from "jquery";
-import { Camera } from '@babylonjs/core/Cameras/camera';
+import {
+    Camera
+} from '@babylonjs/core/Cameras/camera';
 
 export class CameraOptionsDialog extends Dialog {
 
@@ -13,12 +20,12 @@ export class CameraOptionsDialog extends Dialog {
 
         // class fields can't be initialised in here properly       
         eventBus.subscribe(EVENTS.CAMERA_INFO, data => {
-            this.update(data);               
-        });      
+            this.update(data);
+        });
     }
 
     calcDistanceFromOrthoRight(val) {
-        return val*3;
+        return val * 3;
     }
 
     contents() {
@@ -33,17 +40,17 @@ export class CameraOptionsDialog extends Dialog {
         <label for='${this.oid}'>Orthographic</input>
         <input type='radio' id='${this.pid}' name='Camera Type' value='Perspective'>
         <label for='${this.pid}'>Perspective</input>
-
+        <br />
         <div id='${this.pid}opt'>
             Field of View <span id='${this.id}fovInfo'></span> <br />     
-            Angle: <span id='${this.pid}val'></span> Radians <br />    
+            Angle: <span id='${this.pid}val'></span> Degrees <br />    
             <input id='${this.pid}rng' type='range' min=0.05 max=1.6 step=0.01 value=50>
             </input>       
         </div>
 
         <div id='${this.oid}opt'>
             Distance: <span id='${this.id}distanceInfo'></span> <br />   
-            Distance: <span id='${this.oid}val'></span> 
+            Distance: <span id='${this.oid}val'></span> <br />
             <input id='${this.oid}rng' type='range' min=10 max=200 value=50>
             </input>       
         </div>
@@ -53,9 +60,9 @@ export class CameraOptionsDialog extends Dialog {
     }
 
     update(val) {
-        this.data = val;       
+        this.data = val;
         console.log("updating dialog");
-        if(this.data.mode == Camera.ORTHOGRAPHIC_CAMERA) {
+        if (this.data.mode == Camera.ORTHOGRAPHIC_CAMERA) {
             this.updateOrtho();
         } else {
             this.updatePersp();
@@ -68,32 +75,34 @@ export class CameraOptionsDialog extends Dialog {
         $(`#${this.oid}`).prop('checked', false);
         $(`#${this.oid}opt`).hide();
 
-        $(`#${this.pid}`).prop('checked', true);       
+        $(`#${this.pid}`).prop('checked', true);
         $(`#${this.pid}opt`).show();
         $(`#${this.pid}rng`).prop('value', this.data.fov)
-        $(`#${this.pid}val`).text(`${this.data.fov}`)
+        const num = this.data.fov*180/Math.PI;
+        $(`#${this.pid}val`).text(num.toFixed().toString())
     }
 
     updateOrtho() {
-        $(`#${this.pid}`).prop('checked', false);                     
-        $(`#${this.pid}opt`).hide(); 
+        $(`#${this.pid}`).prop('checked', false);
+        $(`#${this.pid}opt`).hide();
 
         $(`#${this.oid}`).prop('checked', true);
         $(`#${this.oid}opt`).show();
 
-        $(`#${this.pid}rng`).prop('value', this.data.distance)
-        $(`#${this.pid}val`).text(`${this.data.distance}`)
+        $(`#${this.oid}rng`).prop('value', this.data.distance)
+        $(`#${this.oid}val`).text(`${this.data.distance}`)
 
     }
 
-    show() {        
+    show() {
         // update the camera details
         this.bus.dispatch(EVENTS.GUI_CAMERA_OPTIONS);
-        super.show();        
+        super.show();
     }
 
     callbacks() {
 
+        // orther radio button
         // on check box change change the checkbox
         $(`#${this.oid}`).on('click', () => {
             this.bus.dispatch(EVENTS.GUI_CAMERA_ORTHO)
@@ -101,22 +110,28 @@ export class CameraOptionsDialog extends Dialog {
             $(`#${this.pid}opt`).hide();
         });
 
+        // ortho range slider
         // range slider, dispatch mode method
-        $(`#${this.oid}rng`).on('change', evt=> {            
-            this.bus.dispatch(EVENTS.GUI_CAMERA_ORTHO, 
-                { distance: evt.target.value});
-            // console.log("evt", evt.target.value);
+        // $(`#${this.oid}rng`).on('change', evt => {
+        $(document).on('input', `#${this.oid}rng`, evt => {
+            this.bus.dispatch(EVENTS.GUI_CAMERA_ORTHO, {
+                distance: evt.target.value
+            });
             $(`#${this.oid}val`).text(evt.target.value);
         });
-       
+
+        // perspective range slider
         // range slider, dispatch mode method
-        $(`#${this.pid}rng`).on('change', evt=> {            
-            this.bus.dispatch(EVENTS.GUI_CAMERA_PERSPECTIVE, 
-                { fov: evt.target.value});
-            // console.log("evt", evt.target.value);
-            $(`#${this.pid}val`).text(evt.target.value);
+        // $(`#${this.pid}rng`).on('change', evt => {
+        $(document).on('input', `#${this.pid}rng`, evt => {
+            this.bus.dispatch(EVENTS.GUI_CAMERA_PERSPECTIVE, {
+                fov: evt.target.value
+            });
+            var num = evt.target.value*180/Math.PI;
+            $(`#${this.pid}val`).text( num.toFixed() );
         });
 
+        // perspective radio button
         $(`#${this.pid}`).on('click', () => {
             this.bus.dispatch(EVENTS.GUI_CAMERA_PERSPECTIVE)
             $(`#${this.oid}opt`).hide();

@@ -70,6 +70,15 @@ export const createOutlineScene = function (engine) {
   ground.material = gridMaterial;
 
 
+  const grassMaterial = new StandardMaterial("grassMaterial", scene);
+//   const grassTexture = new GrassProceduralTexture("grassTexture", 256, scene);
+const grassTexture = new Texture("/img/grass006.jpg");
+  grassMaterial.diffuseTexture = grassTexture;
+  grassMaterial.diffuseTexture.uScale = 10;
+  grassMaterial.diffuseTexture.vScale = 10;
+  grassMaterial.specularColor = new Color3(0.2, 0.2, 0.2);
+
+
   const woodenFenceMaterial = new StandardMaterial("woodFence", scene);
   woodenFenceMaterial.diffuseTexture = new Texture("/img/wood.jpg")
   woodenFenceMaterial.diffuseTexture.uScale = 14;
