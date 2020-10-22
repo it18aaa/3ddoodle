@@ -168,6 +168,7 @@ function createPolygon(outline, scene, color) {
 
         const polygon = polygon_triangulation.build(false);
         polygon.position.y = groundLevel;
+        polygon.receiveShadows = true;
         incrementGroundLevel();
 
         // polygon.material = scene.getMaterialByName("fence");
@@ -188,22 +189,34 @@ eventBus.subscribe(EVENTS.GUI_CLEAR, (payload) => {
 //
 eventBus.subscribe(EVENTS.GUI_CAMERA_ORTHO, (payload) => {
     if (camera.mode == Camera.PERSPECTIVE_CAMERA) {
-        // TODO: hardcoded vars
-        var distance = 26;
+        // TODO: hardcoded vars        
+        var distance = payload && payload.distance ? payload.distance : 26;        
+        setOrthoMode(distance);
+        camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
+    } else {
+        setOrthoMode(payload.distance);
+    }
+
+    function setOrthoMode(distance) {
         var aspect = scene.getEngine().getRenderingCanvasClientRect().height / scene.getEngine().getRenderingCanvasClientRect().width;
+        distance = 
         camera.orthoLeft = -distance / 3;
         camera.orthoRight = distance / 3;
+
         camera.orthoBottom = camera.orthoLeft * aspect;
-        camera.orthoTop = camera.orthoRight * aspect;
-        camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
-    };
+        camera.orthoTop = camera.orthoRight * aspect;        
+    }
 })
 
 // change to perspective mode
 eventBus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {
     if (camera.mode == Camera.ORTHOGRAPHIC_CAMERA) {
         camera.mode = Camera.PERSPECTIVE_CAMERA;
-    };
+    } else {
+        if(payload.fov) {
+            camera.fov = payload.fov
+        }        
+    }
 })
 
 
@@ -214,6 +227,27 @@ eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, payload => {
         total: outline.totalLength
     })
 })
+
+// CAMERA OPTIONS...
+eventBus.subscribe(EVENTS.GUI_CAMERA_OPTIONS, ()=> {
+    // get camera details to send back to gui
+    let data = {};
+
+    data.mode = camera.mode;
+    
+    if (data.mode == Camera.PERSPECTIVE_CAMERA) {
+        data.fov = camera.fov;
+    } else {
+       data.distance = camera.orthoRight * 3;
+    }
+
+    data.aspect = scene.getEngine().getRenderingCanvasClientRect().height 
+                / scene.getEngine().getRenderingCanvasClientRect().width;
+
+
+    eventBus.dispatch(EVENTS.CAMERA_INFO, data);
+})
+
 
 eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
     outline.updateExtents();
@@ -231,6 +265,7 @@ function createFence(outline, data, colour) {
 
     counter++;
     mesh.name = `fence${counter}`;
+    mesh.receiveShadows = true;
 
     var mat = new StandardMaterial("new mat", scene);
     mat.diffuseColor = colour;

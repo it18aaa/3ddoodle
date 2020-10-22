@@ -1,4 +1,4 @@
-
+import { EVENTS } from './constants'
 
 export class EventBus {
     #lastSubscriberID = 0; // likewise increment for     
@@ -7,12 +7,12 @@ export class EventBus {
 
     subscribe(type, callback) {
         let id = this.#lastSubscriberID + 1;
-        
-        if(! this.#subscribers[type]) {
+
+        if (!this.#subscribers[type]) {
             this.#subscribers[type] = {};
         }
- 
-        this.#subscribers[type][id] = callback;        
+
+        this.#subscribers[type][id] = callback;
         this.#lastSubscriberID = id;
 
         return id;
@@ -25,12 +25,20 @@ export class EventBus {
     }
 
     dispatch(type, payload) {
-        // is this event subscribed too?
-        // if not 
-        if (!this.#subscribers[type]) {
-            return;
-        } 
-             Object.keys(this.#subscribers[type])
-                 .forEach(id => this.#subscribers[type][id](payload));
+
+        // check the event type first, otherwise complain and do nothing
+        if (EVENTS.hasOwnProperty(type)) {
+
+            // is this event subscribed too?
+            if (!this.#subscribers[type]) {
+                return;
+            }
+            Object.keys(this.#subscribers[type])
+                .forEach(id => this.#subscribers[type][id](payload));
+        } else {
+            throw `Unknown event: ` + type.toString();;
         }
     }
+
+
+}

@@ -4,7 +4,7 @@ import { getButton, getTextField } from "./guiComponents"
 
 export class Dialog {
     static count = 0;
-    static fadeInTime = 200;
+    static fadeInTime = 400;
     title;
     id;
     hidden = true;  // all modals are hidden to begin with

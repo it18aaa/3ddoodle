@@ -86,7 +86,11 @@ export function drawGui(bus) {
         dialogs.create.show();
     }, "button-container");
 
-    button2("btnCameraOptions", "Camera Options", bus, () => {
+
+    // Manage the Camera Options Dialog
+    
+    // Open the dialog, update the 
+    button2("btnCameraOptions", "Camera Options", bus, () => {    
         dialogs.cameraOptions.show();
     }, "button-container");
 

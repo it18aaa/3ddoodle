@@ -40,12 +40,7 @@ export const createCamera = function (canvas, scene) {
 
 export const createOutlineScene = function (engine) {
   const scene = new Scene(engine);
-
-//  scene.clearColor = new Color3(0.7, 0.85, 1);
-  //scene.clearColor = new Color3(1,1,1);
-
   scene.clearColor = new Color3(0.8, 0.94, 1);
-
   const light = new HemisphericLight(
     "hemiLight",
     new Vector3(-11, 15, 0),
@@ -53,7 +48,6 @@ export const createOutlineScene = function (engine) {
   );
 
   light.intensity = 0.9;
-
 
   // create a built in ground shape
   const ground = MeshBuilder.CreateGround(
