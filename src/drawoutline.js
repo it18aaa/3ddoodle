@@ -70,11 +70,14 @@ import {
     drawGui
 } from "./modules/drawGui";
 
+import { VertexBuffer } from '@babylonjs/core/Meshes/buffer';
+
 
 // DEBUG STUFF
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 
 // TODO:  lots of globals here need to be tidied up.
 
@@ -91,6 +94,10 @@ const adt = new AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 
 const camera = createCamera(canvas, scene);
 
+const l = scene.getLightByName("sun");
+const shadowGenerator = new ShadowGenerator(2048, l);
+shadowGenerator.usePoissonSampling = true;
+
 // this counter is for mesh naming 
 // TODO: move out of global name space
 var counter = 0;
@@ -100,8 +107,6 @@ var groundLevel = 0.001;
 function incrementGroundLevel() {
     groundLevel = groundLevel + 0.001;
 }
-
-
 
 // attach camera to scene to start off with...
 camera.attachControl(canvas, false);
@@ -136,46 +141,19 @@ eventBus.subscribe(EVENTS.CREATE_GRASS, data => {
  });
  
 eventBus.subscribe(EVENTS.CREATE_PATIO, data => {
-    createPolygon(outline, scene, new Color3.Gray());
+    createPolygon(outline, scene, new Color3.Gray(), "patio1");
 });
+
+eventBus.subscribe(EVENTS.CREATE_GRAVEL, data => {
+    createPolygon(outline, scene, new Color3.Gray(), "gravel1");
+});
+
 
 eventBus.subscribe(EVENTS.CREATE_BORDER, data => {
     createPolygon(outline, scene, new Color3(0.2,0.2,0));
 });
 
 
-function createPolygon(outline, scene, color, texture) {
-
-
-    if (outline.getLines().length > 2) {
-        const corners = [];
-        outline.getLines().forEach((line) => {
-            corners.push(new Vector2(line.x, line.z));
-        });
-
-        const polygon_triangulation = new PolygonMeshBuilder(
-            "TODO_CREATE_NAME",
-            corners,
-            scene,
-            EarcutRef
-        );
-
-        const polygon = polygon_triangulation.build(false);
-        polygon.position.y = groundLevel;
-        polygon.receiveShadows = true;
-        incrementGroundLevel();
-
-        // polygon.material = scene.getMaterialByName("fence");
-        if(texture) {
-            polygon.material = scene.getMaterialByName(texture)
-        } else {
-            const material = new StandardMaterial("name-material", scene);
-            material.diffuseColor = color;
-            polygon.material = material;
-        }
-        
-    }
-}
 
 
 // CLEAR BUTTON
@@ -246,8 +224,11 @@ eventBus.subscribe(EVENTS.GUI_BOUNDING, (payload) => {
 })
 
 
-function createFence(outline, data, colour) {
+// create FENCE MATERIAL....
+
+function createFence(outline, data, colour, material) {
     const f = new RibbonFence(outline);
+    // f.doubledOver = material ? false: true;
     f.doubledOver = true;
 
     if (data.height && data.height > 0.01 && data.height < 10) {
@@ -258,13 +239,65 @@ function createFence(outline, data, colour) {
     counter++;
     mesh.name = `fence${counter}`;
     mesh.receiveShadows = true;
+    shadowGenerator.addShadowCaster(mesh);
+    
+    if(material) {
 
-    var mat = new StandardMaterial("new mat", scene);
-    mat.diffuseColor = colour;
-    mesh.material = mat;
+        setUVScale(mesh, outline.totalLength, 2);
 
+        mesh.material = scene.getMaterialByName(material);
+    } else {
+        var mat = new StandardMaterial("new mat", scene);
+        mat.diffuseColor = colour;
+        mesh.material = mat;    
+    }
+    
     scene.addMesh(mesh);
 }
+
+
+// create GROUND MATERIAL utility function...
+//
+function createPolygon(outline, scene, color, texture, data) {
+
+    if (outline.getLines().length > 2) {
+        const corners = [];
+        outline.getLines().forEach((line) => {
+            corners.push(new Vector2(line.x, line.z));
+        });
+
+        const polygon_triangulation = new PolygonMeshBuilder(
+            "TODO_CREATE_NAME",
+            corners,
+            scene,
+            EarcutRef
+        );
+
+        const polygon = polygon_triangulation.build(false);
+        polygon.position.y = groundLevel;
+        
+        polygon.receiveShadows = true;      
+        
+
+        incrementGroundLevel();
+
+        // rescale UV kind before applying texture
+        setUVScale(polygon, outline.getExtents().length, 
+                            outline.getExtents().width)
+        
+        if(texture) {
+            polygon.material = scene.getMaterialByName(texture)
+        } else {
+            const material = new StandardMaterial("name-material", scene);
+            material.diffuseColor = color;
+            polygon.material = material;
+        }       
+    }
+}
+
+
+
+
 
 // FENCE - currently making a fence!
 eventBus.subscribe(EVENTS.GUI_FENCE, data => {
@@ -279,18 +312,12 @@ eventBus.subscribe(EVENTS.GUI_WHITE_FENCE, data => {
 
  // FENCE - currently making a fence!
 eventBus.subscribe(EVENTS.GUI_LIGHT_FENCE, data => {
-    createFence(outline, data, new Color3(0.7, 0.5, 0.3));     
+    createFence(outline, data, new Color3(0.7, 0.5, 0.3), "fence");     
  })
 
  eventBus.subscribe(EVENTS.GUI_BLUE_FENCE, data => {
-    createFence(outline, data, new Color3(0.0, 0.4, 0.6));     
+    createFence(outline, data, new Color3(0.0, 0.4, 0.6), "woodFence");     
  })
-
-
- 
- 
-
-
 
 eventBus.subscribe(EVENTS.GUI_TEXTURE_FENCE, payload => {
     const f = new RibbonFence(outline);
@@ -396,14 +423,10 @@ window.addEventListener("resize", function () {
     engine.resize();
 });
 
-
-
-
 // utility method created by CeeJay on html5gameDevs
 // this changes the UV scale of a mesh to fit a texture
 // so that the same texture can be used on multiple
 // meshes... 
-
 function setUVScale(mesh, uScale, vScale) {
   var i,
     UVs = mesh.getVerticesData(VertexBuffer.UVKind),

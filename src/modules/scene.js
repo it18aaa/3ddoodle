@@ -46,8 +46,11 @@ export const createOutlineScene = function (engine) {
     new Vector3(-11, 15, 0),
     scene
   );
+  light.intensity = 0.1;
 
-  light.intensity = 0.9;
+
+  const sunlight = new DirectionalLight("sun", new Vector3(20,-20,20),scene)
+  sunlight.intensity = 5;
 
   // create a built in ground shape
   const ground = MeshBuilder.CreateGround(
@@ -74,22 +77,36 @@ export const createOutlineScene = function (engine) {
 //   const grassTexture = new GrassProceduralTexture("grassTexture", 256, scene);
 const grassTexture = new Texture("/img/grass006.jpg");
   grassMaterial.diffuseTexture = grassTexture;
-  grassMaterial.diffuseTexture.uScale = 10;
-  grassMaterial.diffuseTexture.vScale = 10;
-  grassMaterial.specularColor = new Color3(0.2, 0.2, 0.2);
+  grassMaterial.diffuseTexture.uScale = 1;
+  grassMaterial.diffuseTexture.vScale = 1;
+  grassMaterial.specularColor = new Color3(0.0, 0.0, 0.0);
 
 
   const woodenFenceMaterial = new StandardMaterial("woodFence", scene);
   woodenFenceMaterial.diffuseTexture = new Texture("/img/wood.jpg")
-  woodenFenceMaterial.diffuseTexture.uScale = 14;
+  woodenFenceMaterial.diffuseTexture.uScale = 1;
   woodenFenceMaterial.diffuseTexture.vScale = 1;
 
   const fenceMat = new StandardMaterial("fence", scene);
-  fenceMat.diffuseTexture = new Texture("/img/fence1.png");
-  fenceMat.diffuseTexture.uScale = 1;
+  fenceMat.diffuseTexture = new Texture("/img/fence2.png");
+  fenceMat.diffuseTexture.uScale = .5;
   fenceMat.diffuseTexture.vScale = 1;
   fenceMat.diffuseTexture.hasAlpha = true;
-  fenceMat.backFaceCulling = false;
+  fenceMat.backFaceCulling = true;
+
+  const patio1 = new StandardMaterial("patio1", scene);
+  patio1.diffuseTexture = new Texture("/img/patio1.jpg");
+  patio1.diffuseTexture.uScale = 1;
+  patio1.diffuseTexture.vScale = 1;
+  patio1.specularColor = new Color3(0.2, 0.2, 0.2);
+
+  const gravel1 = new StandardMaterial("gravel1", scene);
+  gravel1.diffuseTexture = new Texture("/img/gravel1.jpg");
+  gravel1.diffuseTexture.uScale = 3;
+  gravel1.diffuseTexture.vScale = 3;
+  gravel1.specularColor = new Color3(0.02, 0.02, 0.02);
+
+
 
   return scene;
 }

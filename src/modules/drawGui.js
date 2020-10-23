@@ -86,6 +86,10 @@ export function drawGui(bus) {
         dialogs.create.show();
     }, "button-container");
 
+    button2("btnGravel1", "Gravel1", bus, ()=> {
+        bus.dispatch(EVENTS.CREATE_GRAVEL);
+    })
+
 
     // Manage the Camera Options Dialog
     
