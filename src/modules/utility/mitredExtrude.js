@@ -5,6 +5,9 @@ import { Ray } from "@babylonjs/core/Culling/ray";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder/";
 
+
+// this is the mitred extrude function from the BabylonJS website
+//
 export function mitredExtrude(name, options, scene) {
     var shape = options.shape;
     var path = options.path;

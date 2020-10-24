@@ -46,7 +46,7 @@ export const createOutlineScene = function (engine) {
     new Vector3(-11, 15, 0),
     scene
   );
-  light.intensity = 0.1;
+  light.intensity = 0.3;
 
 
   const sunlight = new DirectionalLight("sun", new Vector3(20,-20,20),scene)
@@ -88,9 +88,9 @@ const grassTexture = new Texture("/img/grass006.jpg");
   woodenFenceMaterial.diffuseTexture.vScale = 1;
 
   const fenceMat = new StandardMaterial("fence", scene);
-  fenceMat.diffuseTexture = new Texture("/img/fence2.png");
+  fenceMat.diffuseTexture = new Texture("/img/fence3.png");
   fenceMat.diffuseTexture.uScale = .5;
-  fenceMat.diffuseTexture.vScale = 1;
+  fenceMat.diffuseTexture.vScale = .5;
   fenceMat.diffuseTexture.hasAlpha = true;
   fenceMat.backFaceCulling = true;
 

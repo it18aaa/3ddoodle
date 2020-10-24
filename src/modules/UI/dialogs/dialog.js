@@ -1,6 +1,6 @@
-import { EVENTS } from "./constants";
+import { EVENTS } from "../../event/types";
 import $ from "jquery";
-import { getButton, getTextField } from "./guiComponents"
+import { getButton, getTextField } from "../components"
 
 export class Dialog {
     static count = 0;
