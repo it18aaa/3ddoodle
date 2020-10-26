@@ -10,7 +10,7 @@ import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 // import * as EarcutRef from "earcut";
 // import { Line } from "@babylonjs/gui";
 import { Measurement } from "./measurement";
-import { EVENTS } from "./event/types";
+import { EVENTS } from "../event/types";
 // import { Mesh } from "@babylonjs/core/Meshes";
 // import { mitredExtrude } from "./mitredExtrude";
 

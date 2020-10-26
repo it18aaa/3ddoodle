@@ -1,13 +1,14 @@
 "use strict";
-import { EVENTS } from "../event/types";
-import { button, button2, rangeSlider } from "./components";
+import { EVENTS } from "./constants";
+import { button, button2, rangeSlider } from "./guiComponents";
 import $ from "jquery";
-import { Dialog } from "./dialogs/dialog";
-import { CameraOptionsDialog } from "./dialogs/cameraOptionsDialog";
-import { LengthsDialog } from "./dialogs/lengthsDialog";
+import { Dialog } from "./UI/dialogs/dialog";
+import { CameraOptionsDialog } from "./UI/dialogs/cameraOptionsDialog";
+import { LengthsDialog } from "./UI/dialogs/lengthsDialog";
 
 // this should be an init thing, to set up buttons on tool bars etc..
-export function initUI(bus) {
+
+export function drawGui(bus) {
   // namespace our dialogs
   const dialogs = {};
 
@@ -58,7 +59,7 @@ export function initUI(bus) {
     }
   });
 
-  button2("btnModeEdit", "Edit", bus, () => {
+  button2("btnModeEdit", "Edit Mode", bus, () => {
     bus.dispatch(EVENTS.MODE_EDIT);
     $("#btnModeEdit").addClass("button-active");
     $("#btnModeCamera").removeClass("button-active");
@@ -66,7 +67,7 @@ export function initUI(bus) {
     $("#iconstring").fadeIn(200);
   });
 
-  button2("btnModeCamera", "View", bus, () => {
+  button2("btnModeCamera", "Camera Mode", bus, () => {
     bus.dispatch(EVENTS.MODE_CAMERA);
     $("#btnModeEdit").removeClass("button-active");
     $("#btnModeCamera").addClass("button-active");
@@ -113,22 +114,41 @@ export function initUI(bus) {
     bus.dispatch(EVENTS.CREATE_PATIO);
   });
 
-  
+  button2("btnWhiteFence", "White Fence", bus, () => {
+    bus.dispatch(EVENTS.GUI_WHITE_FENCE, {
+      height: $("#rngHeight").val(),
+    });
+  });
+
   button2("btnLightFence", "Light Fence", bus, () => {
     bus.dispatch(EVENTS.GUI_LIGHT_FENCE, {
       height: $("#rngHeight").val(),
     });
   });
 
-  button2("btnBlueFence", "Woodpallaside", bus, () => {
+  button2("btnBlueFence", "Blue Fence", bus, () => {
     bus.dispatch(EVENTS.GUI_BLUE_FENCE, {
       height: $("#rngHeight").val(),
     });
   });
-  
+
+  button2("btnTexFence", "Texture Fence", bus, () => {
+    bus.dispatch(EVENTS.GUI_TEXTURE_FENCE, {
+      height: $("#rngHeight").val(),
+    });
+  });
+
   rangeSlider("rngHeight", "height", 0, 4, 0.1);
   $("#rngHeight").on("change", function () {
     this.text = "freddo ";
+  });
+
+  button("btnFence", "Fence");
+  $("#btnFence").on("click", () => {
+    const height = $("#rngHeight").val();
+    bus.dispatch(EVENTS.GUI_FENCE, {
+      height: height,
+    });
   });
 
   $("#btnBounding").on("click", () => {
