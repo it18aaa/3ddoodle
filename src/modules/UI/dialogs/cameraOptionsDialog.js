@@ -1,6 +1,5 @@
 import { Dialog } from "./dialog";
 import { EVENTS } from "../../event/types";
-import { getButton } from "../components";
 import $ from "jquery";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
@@ -19,7 +18,7 @@ export class CameraOptionsDialog extends Dialog {
   }
 
   contents() {
-    var content = "";
+    let content = "";
     // this.boo();
     this.oid = `btn${this.id}ortho`;
     this.pid = `btn${this.id}persp`;

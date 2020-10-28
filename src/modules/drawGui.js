@@ -155,11 +155,6 @@ export function drawGui(bus) {
     bus.dispatch(EVENTS.GUI_BOUNDING);
   });
 
-  // // freeze camera button
-  // $("#btnFreezeCamera").on('click', (event) => {
-  //     eventBus.dispatch(EVENTS.GUI_CAMERA_FREEZE_TOGGLE);
-  // });
-
   $("#btnPolygon").on("click", () => {
     bus.dispatch(EVENTS.GUI_POLYGON);
   });
@@ -168,9 +163,6 @@ export function drawGui(bus) {
     bus.dispatch(EVENTS.GUI_CLEAR);
   });
 
-  // $("#btnLength").on('click', (event) => {
-  //     bus.dispatch(EVENTS.GUI_LENGTH_BUTTON)
-  // });
 
   $("#btnKeep").on("click", () => {
     bus.dispatch(EVENTS.GUI_KEEP);
