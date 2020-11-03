@@ -5,13 +5,17 @@ import $ from "jquery";
 import { Dialog } from "./dialogs/dialog";
 import { CameraOptionsDialog } from "./dialogs/cameraOptionsDialog";
 import { LengthsDialog } from "./dialogs/lengthsDialog";
+import { InsertItemDialog } from "./dialogs/insertItemDialog"
 
 // this should be an init thing, to set up buttons on tool bars etc..
 export function initUI(bus) {
+
+
+// DIALOG BOXES :-
+
+
   // namespace our dialogs
   const dialogs = {};
-
-
   dialogs.create = new Dialog("dlgCreate", "Create an item!", bus);
   dialogs.create.render();
 
@@ -27,6 +31,9 @@ export function initUI(bus) {
 
   dialogs.lengths = new LengthsDialog("dlgLengths", "Measurements", bus);
   dialogs.lengths.render();
+
+  dialogs.insert = new InsertItemDialog("dlgInsert", "Insert garden items", bus);
+  dialogs.insert.render();
 
   // Object.entries(dialogs).forEach(obj=>{ obj.render() });
 
@@ -84,6 +91,11 @@ export function initUI(bus) {
     },
     "button-container"
   );
+
+  button2("btnInsert", "Insert", bus, () => {
+    dialogs.insert.update();
+    dialogs.insert.show();
+  })
 
   button2("btnGravel1", "Gravel1", bus, () => {
     bus.dispatch(EVENTS.CREATE_GRAVEL);

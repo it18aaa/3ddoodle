@@ -1,6 +1,6 @@
 import { Dialog } from "./dialog";
-import { EVENTS } from "../../event/types";
-import { getButton } from "../components";
+// import { EVENTS } from "../../event/types";
+// import { getButton } from "../components";
 import $ from "jquery";
 
 export class LengthsDialog extends Dialog {
@@ -16,6 +16,7 @@ export class LengthsDialog extends Dialog {
     // alter the information on the rendered dialog...
     // using the placeholders...
 
+    // change the total
     $(`#${this.id}total`).text(`${this.data.total.toFixed(2)}m`);
 
     let content = `<table class='lengths'>`;

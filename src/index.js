@@ -56,6 +56,7 @@ eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, () => {
     });
 });
 
+
 // CLEAR BUTTON - clears the string line
 eventBus.subscribe(EVENTS.GUI_CLEAR, () => {
     outline.reset();

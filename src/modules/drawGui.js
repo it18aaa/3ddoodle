@@ -89,8 +89,7 @@ export function drawGui(bus) {
     bus.dispatch(EVENTS.CREATE_GRAVEL);
   });
 
-  // Manage the Camera Options Dialog
-
+    // Manage the Camera Options Dialog
   // Open the dialog, update the
   button2(
     "btnCameraOptions",
