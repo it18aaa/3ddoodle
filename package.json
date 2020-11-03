@@ -10,7 +10,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack -w",
+    "build": "webpack",
     "devserver": "webpack-dev-server",
     "lint": "eslint .",
     "test": "mocha"

@@ -11,7 +11,8 @@ export function initUI(bus) {
   // namespace our dialogs
   const dialogs = {};
 
-  dialogs.create = new Dialog("dlgCreate", "Create an item", bus);
+
+  dialogs.create = new Dialog("dlgCreate", "Create an item!", bus);
   dialogs.create.render();
 
   dialogs.cameraOptions = new CameraOptionsDialog(

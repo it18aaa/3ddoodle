@@ -1,0 +1,53 @@
+const path = require("path");
+// const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
+
+module.exports = {
+    mode: 'development',
+    entry: "./src/drawoutline.js",
+    devtool: 'source-map',
+    output: {
+        filename: "main.js",
+        path: path.resolve(__dirname, "dist")
+    },
+    optimization: {
+        minimize: true,
+        minimizer: [new TerserPlugin({
+            test: /\.js(\?.*)?$/i,
+        })]
+    },
+    devServer: {
+        contentBase: path.join(__dirname, "dist"),
+        port: 9000
+    },
+    module: {
+        rules: [{
+                test: /\.js$/,
+                exclude: /(node_modules)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                        plugins: ['@babel/plugin-proposal-class-properties']
+                    }
+                }
+            },
+            {
+                test: /\.css$/,
+                use: [{
+                        loader: 'style-loader'
+                    },
+                    {
+                        loader: 'css-loader'
+                    }
+                ]
+            },
+            {
+                test: /\.(png|jpg)$/,
+                use: [{
+                    loader: 'url-loader'
+                }]
+            }
+        ]
+    }
+}
