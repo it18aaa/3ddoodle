@@ -4,7 +4,7 @@ import { getButton, getTextField } from "../components"
 
 export class Dialog {
     static count = 0;
-    static fadeInTime = 400;
+    static fadeInTime = 300;
     title;
     id;
     hidden = true;  // all modals are hidden to begin with
@@ -40,7 +40,9 @@ export class Dialog {
     render() {
         var output;
         output = `<div class='modal' id='${this.id}'>`;
+        output += `<div id='${this.id}X' class='modal-close'>X</div>`;
         output += `<div class='modal-title'>${this.title}</div>`;
+        output += ``;
 
         // render content here.... 
         output += `<div class='modal-content'>`;
@@ -50,7 +52,7 @@ export class Dialog {
         }
         output += `</div>`;
 
-        output += `<div id='${this.id}-button-container'
+        output += `<div id='${this.id}-button-container' class='modal-button-container'
         style='text-align: right'>`;
         output += getButton(`${this.buttonOkayId}`, 'Okay');
         output += getButton(`${this.buttonCancelId}`, 'Cancel');
@@ -68,6 +70,18 @@ export class Dialog {
         $(`#${this.buttonCancelId}`).on('click', () => {
             this.cancel();
         })
+
+        $(`#${this.id}X`).on('click', () => {
+            this.cancel();
+        })
+
+        // call backs for the close button
+        //
+        $(`#${this.id}X`).css('cursor','pointer')
+        $(`#${this.id}X`).on('click', () => {
+            this.cancel();
+        })
+
 
         // wire up any other call backs
         this.callbacks();
