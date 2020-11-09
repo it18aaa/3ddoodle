@@ -50,14 +50,14 @@ export class CameraOptionsDialog extends Dialog {
 
   update(val) {
     this.data = val;
-    console.log("updating dialog");
+    
     if (this.data.mode == Camera.ORTHOGRAPHIC_CAMERA) {
       this.updateOrtho();
     } else {
       this.updatePersp();
     }
 
-    console.log("cmaera options ", this.data);
+    
   }
 
   updatePersp() {

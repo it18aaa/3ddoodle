@@ -6,6 +6,7 @@ import { Dialog } from "./dialogs/dialog";
 import { CameraOptionsDialog } from "./dialogs/cameraOptionsDialog";
 import { LengthsDialog } from "./dialogs/lengthsDialog";
 import { InsertItemDialog } from "./dialogs/insertItemDialog"
+import { CreateGroundDialog } from "./dialogs/createGroundDialog"
 
 // this should be an init thing, to set up buttons on tool bars etc..
 export function initUI(bus) {
@@ -16,7 +17,7 @@ export function initUI(bus) {
 
   // namespace our dialogs
   const dialogs = {};
-  dialogs.create = new Dialog("dlgCreate", "Create an item!", bus);
+  dialogs.create = new CreateGroundDialog("dlgCreate", "Create ground item!", bus);
   dialogs.create.render();
 
   dialogs.cameraOptions = new CameraOptionsDialog(
@@ -82,14 +83,11 @@ export function initUI(bus) {
     $("#iconeye").fadeIn(200);
   });
 
-  button2(
-    "btnCreate",
-    "Create",
-    bus,
-    () => {
+  button2("btnCreate", "Create", bus, () => {
+      dialogs.create.update();
       dialogs.create.show();
     },
-    "button-container"
+    // "button-container"
   );
 
   button2("btnInsert", "Insert", bus, () => {
