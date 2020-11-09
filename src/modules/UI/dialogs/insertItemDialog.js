@@ -1,4 +1,7 @@
-import { Dialog } from "./dialog";
+import {
+    Dialog
+} from "./dialog";
+import { EVENTS } from '../../event/types';
 import $ from "jquery";
 
 export class InsertItemDialog extends Dialog {
@@ -8,24 +11,29 @@ export class InsertItemDialog extends Dialog {
     }
 
     // update data in the rendered dialog
-    update(data) {        
-        let content = '';
-        
-        // get list of meshes
-        // and update this dialog with it
-        console.log("fetching data")
+    update(data) {
+        let content='';
+        // let content = `<div id='${this.id}selection'>`;
 
-        fetch('https://picsum.photos/v2/list')
+        fetch('http://localhost:3000/api/models')
             .then(response => response.json())
-            .then(data => {
-                data.forEach(item => {
+            .then(res => {
+                console.log(res);
+                this.data = res.data;
+
+                res.data.forEach(item => {
+                    // console.log(item)
                     content += this.drawItem(item);
-                    content += `<hr />`;
-                });
+                })
             })
-            .then(()=> {
-                // rendering content                
+            .then(() => {
+                //close the selection div
+                // content += `</div>`;
+                // render content in place holder
                 $(`#${this.id}list`).html(content);
+            })
+            .catch(err => {
+                console.log("Error: ", err);
             })
     }
 
@@ -33,12 +41,8 @@ export class InsertItemDialog extends Dialog {
     // this is rendered once, render placeholders here
     // and use update method 
     contents() {
-
-        // resizet he dialog
-        console.log(`rendering ${this.id}`)
-        
-
-        let content = '';            
+        // resize the dialog?
+        let content = '';
 
         content = `
         <div id='${this.id}list' class="scrollable"> 
@@ -48,26 +52,43 @@ export class InsertItemDialog extends Dialog {
 
     drawItem(item) {
         let content = '';
+        // if we've clicked on an item, it is selected, so its id will be here to see
+        const selected = this.selected && this.selected.id == item.id ? 'insert-item-thumb-selected' : '';
         content = `
-        <div id=${item.id}>
-        <input type="radio" id="${this.id}rad" value="${item.id}">            
-            ${item.author}</input> <br />
-            ${item.width} <br />
-            ${item.url}<br />
-            ${item.download_url} <br />            
+        <div id=${item.id} class="insert-item-thumb ${selected}" name='${item.id}'>    
+        <img src='http://localhost:3000${item.thumb}' alt='${item.name}' width='100' height='100' name='${item.id}'/>
+           <div name='${item.id}'><span class='thumb-caption' name='${item.id}'>${item.name}</span></div>
+           
         </div>`;
         return content;
+
+        //  ${item.notes}<br />
+        // ${item.id}<br />
+        // ${item.path}<br />            
     }
 
     callbacks() {
         //   super.callbacks();
+        $(`#${this.id}list`).on('click', (ev) => {
+            // console.log(ev.target.name);
+
+            if(ev.target.name) {                
+                const selected = this.data.find(a => a.id == ev.target.name);
+                if(selected) {
+                    this.selected = selected;
+                }
+            }
+            // need a re-render to show the selected item
+            this.update(null);
+        })
     }
 
     accept() {
-        const acceptedid = $(`#${this.id}rad:checked`).val()
-        console.log(`inserting a mesh ${acceptedid}`)
+        
+        console.log(this.selected);
         // load up accepted id by means of the event bus!
-        // eg this.bus.dispatch(EVENTS.LOAD_MESH, { url : acceptedid })
+        
+        this.bus.dispatch(EVENTS.INSERT_MODEL, {model : this.selected });
         super.accept();
     }
 }

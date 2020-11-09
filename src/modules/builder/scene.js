@@ -31,8 +31,8 @@ export const createCamera = function (canvas, scene) {
   //camera.panningSensibility = 1;
   camera.angularSensibilityX = 6400;
   camera.angularSensibilityY = 4400;
-  camera.lowerBetaLimit = 0.01;
-  camera.upperBetaLimit = Math.PI / 2 - 0.1;
+//   camera.lowerBetaLimit = -0.01;
+//   camera.upperBetaLimit = Math.PI / 2 - 0.1;
 
   camera.setTarget(Vector3.Zero());
 
