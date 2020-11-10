@@ -1,45 +1,43 @@
-import { Color3 } from "@babylonjs/core/Maths/math";
 import { GroundLevel } from "../utility/groundLevel";
-import { createGround } from "../builder/createGround";
-import {EVENTS } from '../event/types';
+import { EVENTS } from '../event/types';
 
-export function initGroundController(eventBus, scene, outline) {
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { createGroundPolygon } from "../builder/createGround";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
-    // this increases as new ground items are added...
-    const groundLevel = new GroundLevel();
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-    // make stuff buttons...
-    eventBus.subscribe(EVENTS.CREATE_GRASS, () => {
-        createGround(
-            scene,
-            outline,
-            groundLevel,
-            new Color3(0.2, 0.6, 0.2),
-            "grassMaterial"
-        );
-    });
 
-    eventBus.subscribe(EVENTS.CREATE_PATIO, () => {
-        createGround(
-            scene,
-            outline,
-            groundLevel,
-            new Color3(0.2, 0.6, 0.2),
-            "patio1"
-        );
-    });
+// this increases as new ground items are added...
+const groundLevel = new GroundLevel();
+const url = "http://localhost:3000/";
 
-    eventBus.subscribe(EVENTS.CREATE_GRAVEL, () => {
-        createGround(
-            scene,
-            outline,
-            groundLevel,
-            new Color3(0.2, 0.6, 0.2),
-            "gravel1"
-        );
-    });
+export function initGroundController(eventBus, scene, outline) {  
+    
+    eventBus.subscribe(EVENTS.CREATE_GROUND, details => {        
 
-    eventBus.subscribe(EVENTS.CREATE_BORDER, () => {
-        createGround(scene, outline, groundLevel, new Color3(0.2, 0.2, 0.2));
+        // if material exists already, get a ref to it
+        // otherwise load it  
+        const materialName = "groundMaterial" + details.texture.name;
+        let material = scene.getMaterialByName(materialName);
+        if (!material) {
+            material = new StandardMaterial(materialName, scene);
+            const textureURL = url + details.texture.path + details.texture.file;
+            console.log("TextureURL: ", textureURL);
+            material.diffuseTexture = new Texture(textureURL);
+            material.specularColor = new Color3(0.0, 0.0, 0.0);
+            material.specularPower = 0;
+            material.diffuseTexture.uScale = details.texture.uScale;
+            material.diffuseTexture.uScale = details.texture.vScale;
+        }
+
+        // get a polygon
+        const poly = createGroundPolygon(scene, outline, groundLevel);
+
+        poly.material = material;
+
+        // micro increment ground level
+        groundLevel.increment();
     });
 }
+

@@ -44,7 +44,6 @@ export function initUI(bus) {
 
   // legacy buttons -
   button("btnDebug", "debug");
-  button("btnPolygon", "Polygon");
   button("btnClear", "Clear");
 
   // measure lengths buttons
@@ -95,36 +94,15 @@ export function initUI(bus) {
     dialogs.insert.show();
   })
 
-  button2("btnGravel1", "Gravel1", bus, () => {
-    bus.dispatch(EVENTS.CREATE_GRAVEL);
-  });
-
   // Manage the Camera Options Dialog
-
   // Open the dialog, update the
-  button2(
-    "btnCameraOptions",
-    "Camera Options",
-    bus,
-    () => {
+  button2("btnCameraOptions", "Camera Options", bus, () => {
       dialogs.cameraOptions.show();
     },
     "button-container"
   );
 
-  button2("btnGrass", "Grass", bus, () => {
-    bus.dispatch(EVENTS.CREATE_GRASS);
-  });
 
-  button2("btnBorder", "Border", bus, () => {
-    bus.dispatch(EVENTS.CREATE_BORDER);
-  });
-
-  button2("btnPatio", "Patio", bus, () => {
-    bus.dispatch(EVENTS.CREATE_PATIO);
-  });
-
-  
   button2("btnLightFence", "Light Fence", bus, () => {
     bus.dispatch(EVENTS.GUI_LIGHT_FENCE, {
       height: $("#rngHeight").val(),
@@ -142,21 +120,11 @@ export function initUI(bus) {
     this.text = "freddo ";
   });
 
-  $("#btnBounding").on("click", () => {
-    bus.dispatch(EVENTS.GUI_BOUNDING);
-  });
-
-  $("#btnPolygon").on("click", () => {
-    bus.dispatch(EVENTS.GUI_POLYGON);
-  });
 
   $("#btnClear").on("click", () => {
     bus.dispatch(EVENTS.GUI_CLEAR);
   });
 
-  $("#btnKeep").on("click", () => {
-    bus.dispatch(EVENTS.GUI_KEEP);
-  });
 
   $("#btnDebug").on("click", () => {
     bus.dispatch(EVENTS.GUI_DEBUG);

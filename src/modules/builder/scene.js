@@ -74,15 +74,6 @@ export const createOutlineScene = function (engine) {
   ground.material = gridMaterial;
 
 
-  const grassMaterial = new StandardMaterial("grassMaterial", scene);
-//   const grassTexture = new GrassProceduralTexture("grassTexture", 256, scene);
-const grassTexture = new Texture("/img/grass006.jpg");
-  grassMaterial.diffuseTexture = grassTexture;
-  grassMaterial.diffuseTexture.uScale = 1;
-  grassMaterial.diffuseTexture.vScale = 1;
-  grassMaterial.specularColor = new Color3(0.0, 0.0, 0.0);
-
-
   const woodenFenceMaterial = new StandardMaterial("woodFence", scene);
   woodenFenceMaterial.diffuseTexture = new Texture("/img/wood.jpg")
   woodenFenceMaterial.diffuseTexture.uScale = 1;
@@ -94,18 +85,6 @@ const grassTexture = new Texture("/img/grass006.jpg");
   fenceMat.diffuseTexture.vScale = .5;
   fenceMat.diffuseTexture.hasAlpha = true;
   fenceMat.backFaceCulling = true;
-
-  const patio1 = new StandardMaterial("patio1", scene);
-  patio1.diffuseTexture = new Texture("/img/patio1.jpg");
-  patio1.diffuseTexture.uScale = 1;
-  patio1.diffuseTexture.vScale = 1;
-  patio1.specularColor = new Color3(0.2, 0.2, 0.2);
-
-  const gravel1 = new StandardMaterial("gravel1", scene);
-  gravel1.diffuseTexture = new Texture("/img/gravel1.jpg");
-  gravel1.diffuseTexture.uScale = 3;
-  gravel1.diffuseTexture.vScale = 3;
-  gravel1.specularColor = new Color3(0.02, 0.02, 0.02);
 
   return scene;
 }

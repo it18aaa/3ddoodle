@@ -35,20 +35,11 @@ import {
     ShadowGenerator
 } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 
-import {
-    initCameraController,
-    getCameraActive
-} from "./modules/controllers/camera";
-import {
-    initGroundController
-} from "./modules/controllers/ground";
-import {
-    initFenceController
-} from "./modules/controllers/fence";
+import { initCameraController, getCameraActive } from "./modules/controllers/camera";
+import { initGroundController } from "./modules/controllers/ground";
+import { initFenceController } from "./modules/controllers/fence";
+import { initModelController } from "./modules/controllers/model";
 
-import {
-    SceneLoader
-} from "@babylonjs/core/Loading/sceneLoader";
 
 // init this part of the app
 const eventBus = new EventBus();
@@ -73,6 +64,8 @@ const outline = new StringLine(scene, adt, false, eventBus);
 initGroundController(eventBus, scene, outline);
 initFenceController(eventBus, scene, outline, shadowGenerator);
 initCameraController(camera, canvas, eventBus, scene);
+initModelController(eventBus, scene, outline, shadowGenerator, "http://localhost:3000");
+
 initUI(eventBus);
 
 // GET LENGTHS BUTTON
@@ -101,59 +94,6 @@ eventBus.subscribe(EVENTS.GUI_DEBUG, () => {
 
 
 
-
-eventBus.subscribe(EVENTS.INSERT_MODEL, item => {
-    const url = "http://localhost:3000";
-    console.log("inserting model!");
-    console.log(item.model);
-
-    const lines = outline.getLines();
-    console.log(`there are ${lines.length} points`);
-
-    // check if model loaded, if so, create instance
-    // otherwise load up the mesh
-
-    const mesh = scene.getMeshByName(item.model.name);
-    if(mesh) {
-        console.log("mesh already exists, creating instance of it!");
-        lines.forEach((point, index) => {
-            const instance = mesh.createInstance(item.model.name + index);            
-            instance.position = point;
-            instance.isVisible = true;                
-            shadowGenerator.addShadowCaster(instance);
-        });
-
-    } else{
-        console.log("mesh doesn't yet exist, loading");
-        SceneLoader.ImportMesh(
-            "",
-            url + item.model.path,
-            item.model.file,
-            scene,
-            (meshes) => {
-                console.log(meshes)
-                // get our parent mesh... the parent...
-                const mesh = meshes[0];
-                mesh.name = item.model.name;
-                mesh.isVisible = false;  
-    
-                // create instances on the basis of how many 
-                // stringline points there are
-                lines.forEach((point, index) => {
-                    const instance = mesh.createInstance(item.model.name + index);
-                    
-                    instance.position = point;
-                    instance.isVisible = true;                
-                    shadowGenerator.addShadowCaster(instance);
-                });
-            });
-    }
-
-    
-
-
-
-})
 
 
 // listen for mouse right click, but if

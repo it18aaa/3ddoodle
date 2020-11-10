@@ -26,10 +26,7 @@ export class CreateGroundDialog extends Dialog {
                     content += this.drawItem(item);
                 })
             })
-            .then(() => {
-                //close the selection div
-                // content += `</div>`;
-                // render content in place holder
+            .then(() => {                                
                 $(`#${this.id}list`).html(content);
             })
             .catch(err => {
@@ -54,17 +51,15 @@ export class CreateGroundDialog extends Dialog {
         let content = '';
         // if we've clicked on an item, it is selected, so its id will be here to see
         const selected = this.selected && this.selected.id == item.id ? 'insert-item-thumb-selected' : '';
+
         content = `
         <div id=${item.id} class="insert-item-thumb ${selected}" name='${item.id}'>    
         <img src='http://localhost:3000${item.thumb}' alt='${item.name}' width='100' height='100' name='${item.id}'/>
            <div name='${item.id}'><span class='thumb-caption' name='${item.id}'>${item.name}</span></div>
            
         </div>`;
-        return content;
 
-        //  ${item.notes}<br />
-        // ${item.id}<br />
-        // ${item.path}<br />            
+        return content;
     }
 
     callbacks() {
@@ -88,7 +83,7 @@ export class CreateGroundDialog extends Dialog {
         console.log(this.selected);
         // load up accepted id by means of the event bus!
         
-        this.bus.dispatch(EVENTS.INSERT_MODEL, {model : this.selected });
+        this.bus.dispatch(EVENTS.CREATE_GROUND, { texture : this.selected });
         super.accept();
     }
 }
