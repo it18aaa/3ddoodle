@@ -23,7 +23,7 @@ export function initGroundController(eventBus, scene, outline) {
         if (!material) {
             material = new StandardMaterial(materialName, scene);
             const textureURL = url + details.texture.path + details.texture.file;
-            console.log("TextureURL: ", textureURL);
+            // console.log("TextureURL: ", textureURL);
             material.diffuseTexture = new Texture(textureURL);
             material.specularColor = new Color3(0.0, 0.0, 0.0);
             material.specularPower = 0;

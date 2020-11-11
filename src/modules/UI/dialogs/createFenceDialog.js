@@ -1,5 +1,9 @@
-import { Dialog } from "./dialog";
-import { EVENTS } from '../../event/types';
+import {
+    Dialog
+} from "./dialog";
+import {
+    EVENTS
+} from '../../event/types';
 import $ from "jquery";
 
 export class CreateFenceDialog extends Dialog {
@@ -41,7 +45,13 @@ export class CreateFenceDialog extends Dialog {
 
         content = `
         <div id='${this.id}list' class="scrollable"> 
-        </div>`;
+        </div>
+        <div id='${this.id}height-slider-div'> 
+        Height: <span id='${this.id}height-text'>1</span>m <br />
+        <input id='${this.id}height-slider' type='range' value='1' min='0.2' max='4' step='0.1'>
+        </div>        
+        `;
+
         return content;
     }
 
@@ -61,7 +71,8 @@ export class CreateFenceDialog extends Dialog {
     }
 
     callbacks() {
-        //   super.callbacks();
+        
+        // when click on list grab the selected object
         $(`#${this.id}list`).on('click', (ev) => {
             // console.log(ev.target.name);
 
@@ -74,14 +85,27 @@ export class CreateFenceDialog extends Dialog {
             // need a re-render to show the selected item
             this.update(null);
         })
+
+        // when the height slider changes, update the height labale
+        $(`#${this.id}height-slider`).on('input', (ev) => {
+            $(`#${this.id}height-text`).text(ev.target.value);
+        });
     }
 
+    // what to do when the okay button is pressed
     accept() {
 
-        console.log(this.selected);
-        // load up accepted id by means of the event bus!
+        // put the height into the seleceted object
+        if (this.selected) {
+            this.selected.height = $(`#${this.id}height-slider`).val();
+        }
 
-        this.bus.dispatch(EVENTS.CREATE_GROUND, { texture: this.selected });
+        // ask the event bus to create a fence, with the fence details
+        this.bus.dispatch(EVENTS.CREATE_FENCE, {
+            fence: this.selected
+        });
+
+        // then any other business by the parent
         super.accept();
     }
 }

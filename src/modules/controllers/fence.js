@@ -1,61 +1,56 @@
-import { Color3 } from "@babylonjs/core/Maths/math";
-import { createFence } from "../builder/createFence";
-import {EVENTS } from "../event/types";
-import { Counter } from "../utility/counter";
+import {
+    StandardMaterial
+} from "@babylonjs/core/Materials/standardMaterial";
+import {
+    Texture
+} from "@babylonjs/core/Materials/Textures/texture";
+import {
+    Color3
+} from "@babylonjs/core/Maths/math";
+import {
+    createFence,
+    createFence2
+} from "../builder/createFence";
+import {
+    EVENTS
+} from "../event/types";
+import {
+    Counter
+} from "../utility/counter";
+import {
+    setUVScale
+} from "../utility/setUVScale";
 
 export function initFenceController(eventBus, scene, outline, shadowGenerator) {
 
     const counter = new Counter();
-
-    // FENCE - currently making a fence!
-eventBus.subscribe(EVENTS.GUI_FENCE, (data) => {
-    createFence(
-        scene,
-        shadowGenerator,
-        outline,
-        data,
-        counter,
-        new Color3(0.3, 0.2, 0)
-    );
-});
-
-eventBus.subscribe(EVENTS.GUI_WHITE_FENCE, (data) => {
-    createFence(
-        scene,
-        shadowGenerator,
-        outline,
-        data,
-        counter,
-        new Color3(1, 1, 1)
-    );
-});
-
-// FENCE - currently making a fence!
-eventBus.subscribe(EVENTS.GUI_LIGHT_FENCE, (data) => {
-    createFence(
-        scene,
-        shadowGenerator,
-        outline,
-        data,
-        counter,
-        new Color3(0.7, 0.5, 0.3),
-        "fence"
-    );
-});
-
-eventBus.subscribe(EVENTS.GUI_BLUE_FENCE, (data) => {
-    createFence(
-        scene,
-        shadowGenerator,
-        outline,
-        data,
-        counter,
-        new Color3(0.0, 0.4, 0.6),
-        "woodFence"
-    );
-});
+    const url = "http://localhost:3000/"
 
 
+    eventBus.subscribe(EVENTS.CREATE_FENCE, data => {
 
+        const fenceMaterialName = "fenceMaterial" + data.fence.name;
+        let material = scene.getMaterialByName(fenceMaterialName);
+
+        if (!material) {
+            material = new StandardMaterial(fenceMaterialName, scene);
+            const textureURL = url + data.fence.path + data.fence.file;
+            material.diffuseTexture = new Texture(textureURL);
+            material.specularColor = new Color3(0.0, 0.0, 0.0);
+            material.specularPower = 0;
+            material.diffuseTexture.uScale = data.fence.uScale;
+            material.diffuseTexture.vScale = data.fence.vScale;
+            material.diffuseTexture.hasAlpha = data.fence.hasAlpha;
+        }
+
+        const fence = createFence2(scene, outline, data.fence.height, counter);
+
+        fence.receiveShadows = true;
+        shadowGenerator.addShadowCaster(fence);
+        // change UV Kind so texture in proportion to size of mesh
+        setUVScale(fence, outline.totalLength, 2);
+        // apply the material 
+        fence.material = material;
+    });
 
 }

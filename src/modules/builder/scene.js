@@ -8,8 +8,6 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/";
 import { GridMaterial } from "@babylonjs/materials/grid/gridMaterial";
 // import { GrassProceduralTexture } from "@babylonjs/procedural-textures/grass/grassProceduralTexture";
 
-// import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
-
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 // import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
