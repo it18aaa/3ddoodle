@@ -69,7 +69,7 @@ export const createOutlineScene = function (engine) {
   gridMaterial.lineColor = new Color3(0.4,0.4,0.4);
   gridMaterial.minorUnitVisibility = .55;
   gridMaterial.majorUnitFrequency = 5;
-  gridMaterial.opacity = 0.9;
+  // gridMaterial.opacity = 0.9;
 
   ground.material = gridMaterial;
 

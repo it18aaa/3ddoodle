@@ -5,13 +5,8 @@ export function button(id, text, container = "button-container") {
   $(`.${container}`).append(`<button id='${id}'>${text}</button>`);
 }
 
-export function button2(
-  id,
-  text,
-  event,
-  callback,
-  container = "button-container"
-) {
+export function button2(id, text, event, callback, container = "button-container") {
+  
   // render the button
   $(`.${container}`).append(`<button id='${id}'>${text}</button>`);
 
