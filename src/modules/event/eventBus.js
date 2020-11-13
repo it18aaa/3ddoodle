@@ -31,6 +31,9 @@ export class EventBus {
       if (!this.#subscribers[type]) {
         return;
       }
+
+      console.log(`Event: `, type, payload);
+
       Object.keys(this.#subscribers[type]).forEach((id) =>
         this.#subscribers[type][id](payload)
       );

@@ -62,6 +62,7 @@ export class StringLine {
     const updater = function () {
       that.updateMesh();
     };
+
     this.scene.registerBeforeRender(updater);
 
     this.updater = updater;
@@ -103,6 +104,7 @@ export class StringLine {
 
     dragBehavior.onDragObservable.add((event) => {
       this.updateExtents();
+      this.updateLengths();
     });
 
     return fencePost;
@@ -165,11 +167,12 @@ export class StringLine {
     }
     this.updateTotalLength();
 
-    this.bus.dispatch(EVENTS.STRINGLINE_LENGTHS_UPDATED, {
-      lengths: this.lengths,
-      total: this.totalLength,
-      extents: this.extents,
-    });
+    console.log("updateLengths called!");
+     this.bus.dispatch(EVENTS.STRINGLINE_LENGTHS_UPDATED, {
+       lengths: this.lengths,
+       total: this.totalLength,
+       extents: this.extents,
+     });
   }
 
   // adds a fence post at position ....
@@ -267,7 +270,7 @@ export class StringLine {
       points: this.getLines(),
       instance: this.linesMesh,
     });
-    this.updateLengths();
+    //this.updateLengths();
   }
 
   updateExtents() {

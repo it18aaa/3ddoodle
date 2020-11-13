@@ -19,6 +19,7 @@ export function initCameraController(camera, canvas, eventBus, scene) {
     // change between orthographic and perspective view
     //
     eventBus.subscribe(EVENTS.GUI_CAMERA_ORTHO, (payload) => {
+        
         if (camera.mode == Camera.PERSPECTIVE_CAMERA) {
             // TODO: hardcoded vars
             const distance = payload && payload.distance ? payload.distance : 26;

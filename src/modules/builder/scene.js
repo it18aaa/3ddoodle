@@ -63,7 +63,7 @@ export const createOutlineScene = function (engine) {
   );
 
   const gridMaterial = new GridMaterial("gridMaterial", scene);
-  gridMaterial.mainColor = new Color3(0.94, 0.94, 0.94);
+  gridMaterial.mainColor = new Color3(0.6, 0.7, 0.6);
   gridMaterial.lineColor = new Color3(0.4,0.4,0.4);
   gridMaterial.minorUnitVisibility = .55;
   gridMaterial.majorUnitFrequency = 5;

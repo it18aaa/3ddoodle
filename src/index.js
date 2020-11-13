@@ -54,8 +54,8 @@ const pointerDragBehavior = new PointerDragBehavior({
 });
 //  rotation gizmo for rotating selected meshes
 const gizmo = new PlaneRotationGizmo(
-    new Vector3(0, 1, 0),
-    Color3.FromHexString("#00FF00"),
+    new Vector3(0, 0.5, 0),
+    Color3.FromHexString("#FF44FF"),
     utilityLayer
 );
 gizmo.sensitivity = 14;
@@ -122,6 +122,7 @@ canvas.addEventListener("contextmenu", () => {
 
 let selected = null;
 
+// keyboard behaviour
 scene.onKeyboardObservable.add((kbInfo) => {
     switch (kbInfo.type) {
         case KeyboardEventTypes.KEYDOWN:
@@ -131,7 +132,6 @@ scene.onKeyboardObservable.add((kbInfo) => {
             console.log("Key up: ", kbInfo.event.keyCode);
             break;
     }
-
     if (kbInfo.type === KeyboardEventTypes.KEYDOWN) {
         if (selected) {
             shadowGenerator.removeShadowCaster(selected);
@@ -141,6 +141,8 @@ scene.onKeyboardObservable.add((kbInfo) => {
     }
 });
 
+// call back for the drag and drop stuff
+// requires - selected mesh, gizmo
 function dragAndDropFunctionality(evt) {
     if (
         evt.pickInfo.hit &&
@@ -175,6 +177,10 @@ scene.onPointerObservable.add(
     PointerEventTypes.POINTERDOWN
 );
 
+scene.onPointerObservable.remove(
+    dragAndDropFunctionality,
+    PointerEventTypes.POINTERDOWN
+);
 
 // the canvas/window resize event handler
 window.addEventListener("resize", function () {
