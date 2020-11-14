@@ -4,6 +4,10 @@ import {
 import { EVENTS } from "../event/types";
 
 export function initModelController(eventBus, scene, outline, shadowGenerator, url) {
+    
+    eventBus.subscribe(EVENTS.MODEL_DELETE, item=>{
+        console.log("Delete ", item);
+    })
 
     eventBus.subscribe(EVENTS.INSERT_MODEL, item => {        
         const lines = outline.getLines();

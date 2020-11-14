@@ -40,4 +40,5 @@ export const EVENTS = Object.freeze({
     CREATE_FENCE: "CREATE_FENCE",
     GUI_CLICK_SAVE: "GUI_CLICK_SAVE", 
     GUI_CLICK_LOAD: "GUI_CLICK_SAVE",
+    MODE_TOGGLE: "MODE_TOGGLE"
 });

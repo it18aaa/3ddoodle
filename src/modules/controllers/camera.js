@@ -1,13 +1,18 @@
+import {
+    EVENTS
+} from '../event/types'
+import {
+    animateCameraTo
+} from '../utility/animateCameraTo'
+import {
+    Camera
+} from "@babylonjs/core/Cameras/camera";
 
-import { EVENTS } from '../event/types'
-import { animateCameraTo } from '../utility/animateCameraTo'
-import { Camera } from "@babylonjs/core/Cameras/camera";
-
-   // helper function to determine if the camera has
-    // controls attached to it
-    export function getCameraActive(camera) {
-        return camera.inputs.attachedElement ? true : false;
-    }
+// helper function to determine if the camera has
+// controls attached to it
+export function getCameraActive(camera) {
+    return camera.inputs.attachedElement ? true : false;
+}
 
 
 export function initCameraController(camera, canvas, eventBus, scene) {
@@ -19,7 +24,7 @@ export function initCameraController(camera, canvas, eventBus, scene) {
     // change between orthographic and perspective view
     //
     eventBus.subscribe(EVENTS.GUI_CAMERA_ORTHO, (payload) => {
-        
+
         if (camera.mode == Camera.PERSPECTIVE_CAMERA) {
             // TODO: hardcoded vars
             const distance = payload && payload.distance ? payload.distance : 26;
@@ -51,7 +56,8 @@ export function initCameraController(camera, canvas, eventBus, scene) {
         }
     });
 
-    // CAMERA OPTIONS...
+    // CAMERA OPTIONS... this event is a cry for info
+    // from the gui, so we send back info!
     eventBus.subscribe(EVENTS.GUI_CAMERA_OPTIONS, () => {
         // get camera details to send back to gui
         const data = {};
@@ -68,17 +74,15 @@ export function initCameraController(camera, canvas, eventBus, scene) {
     });
 
     // CAMERA mode toggle button
-    eventBus.subscribe(EVENTS.GUI_CAMERA_FREEZE_TOGGLE, () => {
+    eventBus.subscribe(EVENTS.MODE_TOGGLE, () => {
         if (getCameraActive(camera)) {
             // detach mouse controls from camera
             // and set up drawing mode
-            camera.detachControl(canvas);
-            eventBus.dispatch(EVENTS.CAMERA_FROZEN);
+            eventBus.dispatch(EVENTS.MODE_EDIT);
         } else {
             // kill drawing mode and attach
             // mouse input to camera...
-            camera.attachControl(canvas, true);
-            eventBus.dispatch(EVENTS.CAMERA_UNFROZEN);
+            eventBus.dispatch(EVENTS.MODE_CAMERA);
         }
     });
 

@@ -78,20 +78,31 @@ export function initUI(bus) {
     });
 
     button2("btnModeEdit", "Edit", bus, () => {
-        bus.dispatch(EVENTS.MODE_EDIT);
+        bus.dispatch(EVENTS.MODE_EDIT);     
+    });
+
+    button2("btnModeCamera", "View", bus, () => {
+        bus.dispatch(EVENTS.MODE_CAMERA);        
+    });
+
+    // change the gui to reflect mode changes
+    bus.subscribe(EVENTS.MODE_EDIT, () => {
         $("#btnModeEdit").addClass("button-active");
         $("#btnModeCamera").removeClass("button-active");
         $("#iconeye").fadeOut(200);
         $("#iconstring").fadeIn(200);
     });
 
-    button2("btnModeCamera", "View", bus, () => {
-        bus.dispatch(EVENTS.MODE_CAMERA);
+    // change the gui to reflect camera mode!
+    bus.subscribe(EVENTS.MODE_CAMERA, () => {
         $("#btnModeEdit").removeClass("button-active");
         $("#btnModeCamera").addClass("button-active");
         $("#iconstring").fadeOut(200);
         $("#iconeye").fadeIn(200);
     });
+
+    
+
 
     button2("btnCreate", "Ground", bus, () => {
             dialogs.create.update();
