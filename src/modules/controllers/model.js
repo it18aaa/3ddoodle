@@ -53,38 +53,66 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
     initGroundController(eventBus, scene, outline);
     initFenceController(eventBus, scene, outline, shadowGenerator);
 
+    // label for drag and drop
     let modelLabel = makeModelLabel("");
     modelLabel.isVisible = false;
     adt.addControl(modelLabel);
+
+    // selection
+    let selected = null;
+
     // when a model is selected, add drag behaviour and attach
     // rotation gizmo
-    eventBus.subscribe(EVENTS.MODEL_SELECT, item => {
-        const selected = scene.getMeshByName(item.name);
-        selected.addBehavior(pointerDragBehavior);
-        gizmo.attachedMesh = selected;        
-        modelLabel.text = selected.name;
-        modelLabel.linkWithMesh(selected)
+    eventBus.subscribe(EVENTS.MODEL_SELECT, item => {        
+        selected = item.id;
+        const mesh = scene.getMeshByUniqueID(item.id);
+        mesh.addBehavior(pointerDragBehavior);
+        gizmo.attachedMesh = mesh;        
+        modelLabel.text = mesh.name;
+        modelLabel.linkWithMesh(mesh)
         modelLabel.isVisible = true;
     });
 
 
- 
-
     // when a mdel is deslected, remove drag behaviour,
     // and detach gizmo
     eventBus.subscribe(EVENTS.MODEL_UNSELECT, item => {
-        const unselected = scene.getMeshByName(item.name);
-        unselected.removeBehavior(unselected.getBehaviorByName("PointerDrag"));
-        gizmo.attachedMesh = null;
-        modelLabel.text = "";
-        modelLabel.linkWithMesh(null);
-        modelLabel.isVisible = false;
+        if(selected) {
+            selected = null;
+            const mesh = scene.getMeshByUniqueID(item.id);
+            mesh.removeBehavior(mesh.getBehaviorByName("PointerDrag"));
+            gizmo.attachedMesh = null;
+            modelLabel.text = "";
+            modelLabel.linkWithMesh(null);
+            modelLabel.isVisible = false;
+        }        
     });
 
-    eventBus.subscribe(EVENTS.MODEL_DELETE, item => {
-        console.log("Delete ", item);
-        const unselected = scene.getMeshByName(item.name);
+    //
+    eventBus.subscribe(EVENTS.DELETE_REQUEST, ()=> {
+        // do we have a model selected?
+        if(selected) {
+            const mesh = scene.getMeshByUniqueID(selected);
+            eventBus.dispatch(EVENTS.DELETE_CONFIRM, 
+                {
+                    id: selected,
+                    name: mesh.name
+                });
+        };
+    });
 
+
+
+    eventBus.subscribe(EVENTS.DELETE_DO, item => {
+        console.log("Delete ", item);
+        const unselected = scene.getMeshByUniqueID(item.id);
+        unselected.removeBehavior(unselected.getBehaviorByName("PointerDrag"));
+        selected = null;
+        modelLabel.text = "";
+        modelLabel.isVisible = false;
+        gizmo.attachedMesh =null;
+        scene.removeMesh(unselected);
+        unselected.dispose();
     });
 
     eventBus.subscribe(EVENTS.MODEL_ADD, item => {
@@ -97,7 +125,7 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
             // mesh already exists, creating instance of it!
             counter.increment();
             lines.forEach((point, index) => {
-                const instance = mesh.createInstance(item.model.name + counter.get() + index);
+                const instance = mesh.createInstance(`${item.model.name}.${counter.get().toString()}.${index}`);
                 instance.position = point;
                 instance.isVisible = true;
                 shadowGenerator.addShadowCaster(instance);
@@ -121,7 +149,7 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
                     // create instances on the basis of how many 
                     // stringline points there are
                     lines.forEach((point, index) => {
-                        const instance = mesh.createInstance(item.model.name + index);
+                        const instance = mesh.createInstance(`${item.model.name}.${counter.get().toString()}.${index}`);
 
                         instance.position = point;
                         instance.isVisible = true;

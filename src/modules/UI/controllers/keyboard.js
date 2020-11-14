@@ -14,7 +14,7 @@ export function initKeyboard(scene, bus) {
             switch (kbInfo.event.key) {
                 case "Delete":
                 case "Backspace":
-                    bus.dispatch(EVENTS.KEYBOARD_DELETE);
+                    bus.dispatch(EVENTS.DELETE_REQUEST);
                     break
                 case "m":
                 case "M":

@@ -148,6 +148,5 @@ export class Dialog {
     resetForm() {
         // method to override
         // fill out form fields
-
     }
 }

@@ -8,12 +8,25 @@ import {
     rangeSlider
 } from "./components";
 import $ from "jquery";
-import { Dialog } from "./dialogs/dialog";
-import { CameraOptionsDialog } from "./dialogs/cameraOptionsDialog";
-import { LengthsDialog } from "./dialogs/lengthsDialog";
-import { InsertItemDialog } from "./dialogs/insertItemDialog"
-import { CreateGroundDialog } from "./dialogs/createGroundDialog"
-import { CreateFenceDialog } from "./dialogs/createFenceDialog";
+import {
+    Dialog
+} from "./dialogs/dialog";
+import {
+    CameraOptionsDialog
+} from "./dialogs/cameraOptionsDialog";
+import {
+    LengthsDialog
+} from "./dialogs/lengthsDialog";
+import {
+    InsertItemDialog
+} from "./dialogs/insertItemDialog"
+import {
+    CreateGroundDialog
+} from "./dialogs/createGroundDialog"
+import {
+    CreateFenceDialog
+} from "./dialogs/createFenceDialog";
+import { ConfirmDeleteDialog } from "./dialogs/confirmDeleteDialog";
 
 
 // Initialise the user interface - draw all the buttons and dialogs
@@ -34,6 +47,9 @@ export function initUI(bus) {
         bus
     );
     dialogs.cameraOptions.render();
+
+    dialogs.confirmDelete = new ConfirmDeleteDialog("dlgConfirmDelete", "Confirm delete", bus );
+    dialogs.confirmDelete.render();
 
     dialogs.other = new Dialog("dlgCamera", "Other", bus);
     dialogs.other.render();
@@ -78,11 +94,11 @@ export function initUI(bus) {
     });
 
     button2("btnModeEdit", "Edit", bus, () => {
-        bus.dispatch(EVENTS.MODE_EDIT);     
+        bus.dispatch(EVENTS.MODE_EDIT);
     });
 
     button2("btnModeCamera", "View", bus, () => {
-        bus.dispatch(EVENTS.MODE_CAMERA);        
+        bus.dispatch(EVENTS.MODE_CAMERA);
     });
 
     // change the gui to reflect mode changes
@@ -101,8 +117,11 @@ export function initUI(bus) {
         $("#iconeye").fadeIn(200);
     });
 
-    
 
+    bus.subscribe(EVENTS.DELETE_CONFIRM, (item) => {        
+        dialogs.confirmDelete.update(item);
+        dialogs.confirmDelete.show();
+    })
 
     button2("btnCreate", "Ground", bus, () => {
             dialogs.create.update();
@@ -116,7 +135,7 @@ export function initUI(bus) {
         dialogs.insert.show();
     })
 
-    button2("btnFence", "Fences", bus, ()=> {
+    button2("btnFence", "Fences", bus, () => {
         dialogs.fence.update();
         dialogs.fence.show();
     })
@@ -128,25 +147,6 @@ export function initUI(bus) {
         },
         "button-container"
     );
-
-
-    // button2("btnLightFence", "Light Fence", bus, () => {
-    //     bus.dispatch(EVENTS.GUI_LIGHT_FENCE, {
-    //         height: $("#rngHeight").val(),
-    //     });
-    // });
-
-    // button2("btnBlueFence", "Woodpallaside", bus, () => {
-    //     bus.dispatch(EVENTS.GUI_BLUE_FENCE, {
-    //         height: $("#rngHeight").val(),
-    //     });
-    // });
-
-    // rangeSlider("rngHeight", "height", 0, 4, 0.1);
-    // $("#rngHeight").on("change", function () {
-    //     this.text = "freddo ";
-    // });
-
 
     $("#btnClear").on("click", () => {
         bus.dispatch(EVENTS.GUI_CLEAR);
