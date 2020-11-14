@@ -28,27 +28,15 @@ import {
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 
-import {
-    PointerDragBehavior
-} from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
+
 import {
     PointerEventTypes
 } from "@babylonjs/core/Events/pointerEvents";
 import {
     HighlightLayer
 } from "@babylonjs/core/Layers/highlightLayer";
-import {
-    Vector3
-} from "@babylonjs/core/Maths/math.vector";
-import {
-    Color3
-} from "@babylonjs/core/Maths/math.color";
-import {
-    PlaneRotationGizmo
-} from "@babylonjs/core/Gizmos/planeRotationGizmo";
-import {
-    UtilityLayerRenderer
-} from "@babylonjs/core/Rendering/utilityLayerRenderer";
+
+
 import {
     ShadowGenerator
 } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
@@ -56,22 +44,23 @@ import {
     initCameraController,
     getCameraActive,
 } from "./modules/controllers/camera";
-import {
-    initGroundController
-} from "./modules/controllers/ground";
-import {
-    initFenceController
-} from "./modules/controllers/fence";
+
 import {
     initModelController
 } from "./modules/controllers/model";
 import {
-    KeyboardEventTypes
-} from "@babylonjs/core/Events/keyboardEvents";
+    initKeyboard
+} from "./modules/UI/controllers/keyboard";
+import {
+    initMouseController
+} from "./modules/UI/controllers/mouse";
+
 
 // init this part of the app
 const eventBus = new EventBus();
+// the canvas we're rendering too...
 const canvas = document.getElementById("renderCanvas");
+
 const engine = new Engine(canvas, true, {
     stencil: true,
 });
@@ -81,25 +70,14 @@ const scene = createOutlineScene(engine, {
 const adt = new AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 const camera = createCamera(canvas, scene);
 const shadowGenerator = new ShadowGenerator(2048, scene.getLightByName("sun"));
+
 shadowGenerator.usePoissonSampling = true;
 
 // drag and drop stuff
 //
 // highlight layer for highlighting selected meshes
 const highlightLayer = new HighlightLayer("hl1", scene);
-const utilityLayer = new UtilityLayerRenderer(scene);
 
-// drag behaviour for garden items!
-const pointerDragBehavior = new PointerDragBehavior({
-    dragPlaneNormal: new Vector3(0, 1, 0),
-});
-//  rotation gizmo for rotating selected meshes
-const gizmo = new PlaneRotationGizmo(
-    new Vector3(0, 1, 0),
-    Color3.FromHexString("#FF44FF"),
-    utilityLayer
-);
-gizmo.sensitivity = 14;
 ///   end of  drag drop stuff
 
 
@@ -112,16 +90,17 @@ const showfps = 1;
 // garden
 const outline = new StringLine(scene, adt, false, eventBus);
 
-initGroundController(eventBus, scene, outline);
-initFenceController(eventBus, scene, outline, shadowGenerator);
+
 initCameraController(camera, canvas, eventBus, scene);
 initModelController(
     eventBus,
     scene,
     outline,
     shadowGenerator,
-    "http://localhost:3000"
+    "http://localhost:3000", adt
 );
+initKeyboard(scene, eventBus);
+initMouseController(scene, eventBus);
 
 initUI(eventBus);
 
@@ -164,80 +143,8 @@ canvas.addEventListener("contextmenu", () => {
 });
 
 // set a default mode
-eventBus.dispatch(EVENTS.MODE_EDIT );
+eventBus.dispatch(EVENTS.MODE_EDIT);
 
-// keyboard behaviour
-scene.onKeyboardObservable.add((kbInfo) => {
-
-    if (kbInfo.type === KeyboardEventTypes.KEYUP) {
-        switch (kbInfo.event.key) {
-            case "Delete":
-            case "Backspace":
-                eventBus.dispatch(EVENTS.KEYBOARD_DELETE);
-                break
-            case "m":
-            case "M":
-                console.log("mmmmmmm")
-                eventBus.dispatch(EVENTS.MODE_TOGGLE);
-                break;
-                
-        }
-    }
-
-    // if (kbInfo.type === KeyboardEventTypes.KEYUP) {
-    //     if (selected) {
-    //         shadowGenerator.removeShadowCaster(selected);
-    //         gizmo.attachedMesh = null;
-    //         scene.removeMesh(selected);
-    //     }
-    // }
-});
-
-
-let selected = null;
-// call back for the drag and drop stuff
-// requires - selected mesh, gizmo
-function dragAndDropFunctionality(evt) {
-    if (
-        evt.pickInfo.hit &&
-        evt.pickInfo.pickedMesh &&
-        evt.event.button === 0 &&
-        evt.pickInfo.pickedMesh.name !== "ground1"
-    ) {
-
-        // if nothing is selected
-        if (!selected) {
-            selected = evt.pickInfo.pickedMesh;
-            console.log(selected);
-            selected.addBehavior(pointerDragBehavior);
-            //    highlightLayer.addMesh(selected, Color3.White());
-            gizmo.attachedMesh = selected;
-        } else if (selected && evt.pickInfo.pickedMesh.name != selected.name) {
-
-            selected.removeBehavior(selected.getBehaviorByName("PointerDrag"));
-            //    highlightLayer.removeMesh(selected);
-            selected = evt.pickInfo.pickedMesh;
-            selected.addBehavior(pointerDragBehavior);
-            //    highlightLayer.addMesh(selected, Color3.White());
-            gizmo.attachedMesh = selected;
-        }
-    } else if (selected) {
-        selected.removeBehavior(selected.getBehaviorByName("PointerDrag"));
-        // highlightLayer.removeMesh(selected);
-        selected = null;
-        gizmo.attachedMesh = null;
-    }
-}
-
-scene.onPointerObservable.add(
-    dragAndDropFunctionality,
-    PointerEventTypes.POINTERDOWN
-);
-
-// scene.onPointerObservable.remove(
-//     dragAndDropFunctionality,
-//     PointerEventTypes.POINTERDOWN
-// );
 
 // the canvas/window resize event handler
 window.addEventListener("resize", function () {

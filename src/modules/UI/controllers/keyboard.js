@@ -1,0 +1,35 @@
+import {
+    EVENTS
+} from '../../event/types';
+import {
+    KeyboardEventTypes
+} from "@babylonjs/core/Events/keyboardEvents";
+
+
+export function initKeyboard(scene, bus) {
+
+    // keyboard behaviour
+    scene.onKeyboardObservable.add((kbInfo) => {
+        if (kbInfo.type === KeyboardEventTypes.KEYUP) {
+            switch (kbInfo.event.key) {
+                case "Delete":
+                case "Backspace":
+                    bus.dispatch(EVENTS.KEYBOARD_DELETE);
+                    break
+                case "m":
+                case "M":
+                    console.log("mmmmmmm")
+                    bus.dispatch(EVENTS.MODE_TOGGLE);
+                    break;
+            }
+        }
+
+        // if (kbInfo.type === KeyboardEventTypes.KEYUP) {
+        //     if (selected) {
+        //         shadowGenerator.removeShadowCaster(selected);
+        //         gizmo.attachedMesh = null;
+        //         scene.removeMesh(selected);
+        //     }
+        // }
+    });
+}

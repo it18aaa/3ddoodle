@@ -88,7 +88,7 @@ export class InsertItemDialog extends Dialog {
         console.log(this.selected);
         // load up accepted id by means of the event bus!
         
-        this.bus.dispatch(EVENTS.INSERT_MODEL, {model : this.selected });
+        this.bus.dispatch(EVENTS.MODEL_ADD, {model : this.selected });
         super.accept();
     }
 }
