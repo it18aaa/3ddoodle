@@ -25,6 +25,7 @@ export class StringLine {
   totalLength;
   bus;
 
+
   type;
   showLabels = true;
   isClosed = true;
@@ -43,6 +44,8 @@ export class StringLine {
     this.adt = adt;
     this.isClosed = isClosed;
     this.bus = bus;
+    this.snapValue = 0.2;
+    this.snapping = true;
 
     let mx = new Measurement(this.scene, this.adt, "x");
     let my = new Measurement(this.scene, this.adt, "y");
@@ -68,10 +71,15 @@ export class StringLine {
     this.updater = updater;
   }
 
+  snapTo(input) {
+      let val = 1 / this.snapValue;
+      return Math.round(input * val) / val;
+  }
+
+
   get type() {
     return this.type;
   }
-
   set type(type) {
     this.type = type;
   }
@@ -105,6 +113,24 @@ export class StringLine {
     dragBehavior.onDragObservable.add((event) => {
       this.updateExtents();
       this.updateLengths();
+    });
+
+
+    // snapping
+    dragBehavior.onDragEndObservable.add(event => {
+        // console.log("DRAG END EVENT: ", event);
+        // console.log(" this: ", this)
+        // console.log("fencePost.position: ", fencePost.position)
+
+
+        // fencePost.position.x = Math.round(fencePost.position.x * 1) / 1
+        // fencePost.position.y = Math.round(fencePost.position.y)
+        // fencePost.position.z = Math.round(fencePost.position.z * 1) / 1
+
+        if(this.snapping) {
+            fencePost.position.x = this.snapTo(fencePost.position.x);
+            fencePost.position.z = this.snapTo(fencePost.position.z);
+        }
     });
 
     return fencePost;
@@ -182,6 +208,9 @@ export class StringLine {
       newFencePost.position = position;
       newFencePost.position.y = this.dimensions.height / 2;
 
+      newFencePost.position.x = this.snapTo(newFencePost.position.x);
+      newFencePost.position.z = this.snapTo(newFencePost.position.z);
+
       this.posts.push(newFencePost);
       this.updateLengths();
       this.resizeMesh();
@@ -238,7 +267,7 @@ export class StringLine {
     }
 
     this.linesMesh = MeshBuilder.CreateLines(
-      "lines",
+      "stringLine",
       {
         points: this.getLines(),
         updatable: true,

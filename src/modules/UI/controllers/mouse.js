@@ -34,7 +34,9 @@ export function initMouseController(scene, bus) {
                     evt.pickInfo.hit &&
                     evt.pickInfo.pickedMesh &&
                     evt.event.button === 0 &&
-                    evt.pickInfo.pickedMesh.name !== "ground1"
+                    evt.pickInfo.pickedMesh.name !== "ground1" && 
+                    evt.pickInfo.pickedMesh.name !== "stringLine" &&  
+                    evt.pickInfo.pickedMesh.name.substring(0,4) !== "post"
                 ) {
 
                     // if nothing is selected, then select the mesh
@@ -62,7 +64,7 @@ export function initMouseController(scene, bus) {
                 }
             }
         },
-        PointerEventTypes.POINTERDOWN
+        PointerEventTypes.POINTERPICK
     );
 
 
