@@ -61,6 +61,7 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
     // selection
     let selected = null;
 
+
     // when a model is selected, add drag behaviour and attach
     // rotation gizmo
     eventBus.subscribe(EVENTS.MODEL_SELECT, item => {        
@@ -86,6 +87,16 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
             modelLabel.linkWithMesh(null);
             modelLabel.isVisible = false;
         }        
+    });
+
+
+    // when camera mode is engaged, we need to deselected any selected
+    // meshes, otherwise drag controls will clash with camera controls
+    // and models will slide around 
+    eventBus.subscribe(EVENTS.MODE_CAMERA, ()=> {
+        if(selected) {
+            eventBus.dispatch(EVENTS.MODEL_UNSELECT, { id: selected})
+        }
     });
 
     //

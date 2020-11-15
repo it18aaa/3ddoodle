@@ -6,32 +6,15 @@ import "regenerator-runtime/runtime";
 import {
     Engine
 } from "@babylonjs/core/Engines/engine";
-import {
-    AdvancedDynamicTexture
-} from "@babylonjs/gui/2D/advancedDynamicTexture";
-import {
-    createCamera,
-    createOutlineScene
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import { createCamera, createOutlineScene
 } from "./modules/builder/scene";
-import {
-    StringLine
-} from "./modules/builder/stringLine";
-import {
-    EventBus
-} from "./modules/event/eventBus";
-import {
-    EVENTS
-} from "./modules/event/types";
-import {
-    initUI
-} from "./modules/UI";
+import { StringLine } from "./modules/builder/stringLine";
+import { EventBus } from "./modules/event/eventBus";
+import { EVENTS } from "./modules/event/types";
+import { initUI } from "./modules/UI";
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
-
-
-import {
-    PointerEventTypes
-} from "@babylonjs/core/Events/pointerEvents";
 import {
     HighlightLayer
 } from "@babylonjs/core/Layers/highlightLayer";
