@@ -27,6 +27,8 @@ import {
     CreateFenceDialog
 } from "./dialogs/createFenceDialog";
 import { ConfirmDeleteDialog } from "./dialogs/confirmDeleteDialog";
+import { OpenDialog } from "./dialogs/openDialog";
+import { SaveDialog } from "./dialogs/saveDialog";
 
 
 // Initialise the user interface - draw all the buttons and dialogs
@@ -37,6 +39,12 @@ export function initUI(bus) {
     // namespace our dialogs
     const dialogs = {};
 
+
+    dialogs.open = new OpenDialog("dlgOpen", "Open Design", bus);
+    dialogs.open.render();
+
+    dialogs.save = new SaveDialog("dlgSave", "Save design", bus);
+    dialogs.save.render();
 
     dialogs.create = new CreateGroundDialog("dlgCreate", "Create ground item!", bus);
     dialogs.create.render();
@@ -70,8 +78,20 @@ export function initUI(bus) {
     $("body").append('<div class="button-container">Garden Designer! </div>');
 
     // legacy buttons -
-    button("btnDebug", "debug");
+    button("btnDebug", "debug");   
     button("btnClear", "Clear");
+
+
+    button2("btnOpen", "Open", bus, ()=>{
+        dialogs.open.update(null);
+        dialogs.open.show();
+    });
+
+    button2("btnSave", "Save", bus, ()=> {
+        dialogs.save.update(null);
+        dialogs.save.show();
+    } )
+
 
     // measure lengths buttons
     button2("btnLength", "Measurements", bus, () => {

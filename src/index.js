@@ -38,6 +38,7 @@ import {
     initMouseController
 } from "./modules/UI/controllers/mouse";
 
+import { initFileController} from "./modules/controllers/file";
 
 // init this part of the app
 const eventBus = new EventBus();
@@ -83,7 +84,12 @@ initModelController(
     "http://localhost:3000", adt
 );
 initKeyboard(scene, eventBus);
+
+
 initMouseController(scene, eventBus);
+
+// save and load etc..
+initFileController(scene, eventBus);
 
 initUI(eventBus);
 

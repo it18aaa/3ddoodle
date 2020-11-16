@@ -6,13 +6,8 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder/";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-// import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-// import * as EarcutRef from "earcut";
-// import { Line } from "@babylonjs/gui";
 import { Measurement } from "./measurement";
 import { EVENTS } from "../event/types";
-// import { Mesh } from "@babylonjs/core/Meshes";
-// import { mitredExtrude } from "./mitredExtrude";
 
 export class StringLine {
   scene;
@@ -116,17 +111,8 @@ export class StringLine {
     });
 
 
-    // snapping
-    dragBehavior.onDragEndObservable.add(event => {
-        // console.log("DRAG END EVENT: ", event);
-        // console.log(" this: ", this)
-        // console.log("fencePost.position: ", fencePost.position)
-
-
-        // fencePost.position.x = Math.round(fencePost.position.x * 1) / 1
-        // fencePost.position.y = Math.round(fencePost.position.y)
-        // fencePost.position.z = Math.round(fencePost.position.z * 1) / 1
-
+    // snapping behaviour on drag
+    dragBehavior.onDragEndObservable.add(event => {        
         if(this.snapping) {
             fencePost.position.x = this.snapTo(fencePost.position.x);
             fencePost.position.z = this.snapTo(fencePost.position.z);
@@ -192,8 +178,7 @@ export class StringLine {
       }
     }
     this.updateTotalLength();
-
-    console.log("updateLengths called!");
+    
      this.bus.dispatch(EVENTS.STRINGLINE_LENGTHS_UPDATED, {
        lengths: this.lengths,
        total: this.totalLength,
