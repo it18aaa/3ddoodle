@@ -13,10 +13,10 @@ export function initFileController(scene, bus) {
     // file event handlers
 
     bus.subscribe(EVENTS.SCENE_SAVE, item => {
-        console.log("SAVE: ", item)
+        // console.log("SAVE: ", item)
 
         const serializedScene = SceneSerializer.Serialize(scene);
-        const strScene = JSON.stringify(serializedScene);
+        // const strScene = JSON.stringify(serializedScene);
 
         const data = {
             method: 'POST',
@@ -24,8 +24,12 @@ export function initFileController(scene, bus) {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: strScene
-        }
+            body: JSON.stringify({
+                name: item.name,
+                data: serializedScene
+            })
+        };
+        
 
         fetch('http://localhost:3000/api/save', data)
             .then(res => res.json())
@@ -42,7 +46,17 @@ export function initFileController(scene, bus) {
     bus.subscribe(EVENTS.SCENE_OPEN, item => {
         console.log("OPEN: ", item);
 
-        // do load stuff...
+        const fname = item.name // requires validation!
+
+        fetch(`http://localhost:3000/api/open/${fname}`)
+            .then(res => res.json())
+            .then(res => {
+                console.log(res.name);
+                console.log(res.data)
+            })
+            .catch(err => {
+                console.log("ERROR: ", err)
+            })
     })
 
 }

@@ -18,11 +18,21 @@ export class OpenDialog extends Dialog {
     }
 
     contents() {
-        return `Open a design!`;
+        let content = "";
+
+        content += `
+        Open a design 
+
+        Name - <input id='${this.id}name' type='text' />
+        `;
+
+        return content;
     }
 
     accept() {
-        // this.bus.dispatch(EVENTS.DELETE_DO, this.data)
+        let name = $(`#${this.id}name`).val();
+        console.log(name)
+        this.bus.dispatch(EVENTS.SCENE_OPEN, { name: name });
         super.accept();
     }
 
