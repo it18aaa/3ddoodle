@@ -6,7 +6,7 @@ import {
 } from "../../event/types";
 
 
-export function initMouseController(scene, bus) {
+export function initMouseController(state, bus) {
 
     let selected = null;
 
@@ -23,10 +23,10 @@ export function initMouseController(scene, bus) {
     // to see if controls are attached ... 
     // camera.inputs.attachedElement
 
-    scene.onPointerObservable.add(evt => {
+    state.scene.onPointerObservable.add(evt => {
             // if there are no inputs attached to the camera,
             // we're not in a view mode...
-            if (!scene.activeCamera.inputs.attachedElement) {
+            if (!state.scene.activeCamera.inputs.attachedElement) {
 
                 // if we've clicked on a mesh, that isn't the ground, with
                 // left mouse button...

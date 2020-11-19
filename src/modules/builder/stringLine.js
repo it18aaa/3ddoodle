@@ -10,7 +10,7 @@ import { Measurement } from "./measurement";
 import { EVENTS } from "../event/types";
 
 export class StringLine {
-  scene;
+  state;
   posts = [];
   lengths = [];
   labels = [];
@@ -32,9 +32,9 @@ export class StringLine {
     diameterBottom: 0.02,
   };
 
-  constructor(scene, adt, isClosed, bus) {
-    this.scene = scene;
-    this.postMaterial = new StandardMaterial("postMaterial", scene);
+  constructor(state, adt, isClosed, bus) {
+    this.state = state;
+    this.postMaterial = new StandardMaterial("postMaterial", state.scene);
     this.postMaterial.diffuseColor = new Color3(1, 0.5, 0);
     this.adt = adt;
     this.isClosed = isClosed;
@@ -42,8 +42,8 @@ export class StringLine {
     this.snapValue = 0.2;
     this.snapping = true;
 
-    let mx = new Measurement(this.scene, this.adt, "x");
-    let my = new Measurement(this.scene, this.adt, "y");
+    let mx = new Measurement(this.state.scene, this.adt, "x");
+    let my = new Measurement(this.state.scene, this.adt, "y");
 
     mx.offset = 0.5;
     mx.height = 0.25;
@@ -60,9 +60,7 @@ export class StringLine {
     const updater = function () {
       that.updateMesh();
     };
-
-    this.scene.registerBeforeRender(updater);
-
+    this.state.scene.registerBeforeRender(updater);
     this.updater = updater;
   }
 
@@ -93,7 +91,7 @@ export class StringLine {
     const fencePost = MeshBuilder.CreateCylinder(
       name,
       this.dimensions,
-      this.scene
+      this.state.scene
     );
 
     fencePost.material = this.postMaterial;
@@ -257,7 +255,7 @@ export class StringLine {
         points: this.getLines(),
         updatable: true,
       },
-      this.scene
+      this.state.scene
     );
   }
 
@@ -334,7 +332,7 @@ export class StringLine {
     this.reset();
     this.adt = null;
     var that = this;
-    this.scene.unregisterBeforeRender(this.updater);
-    this.scene = null;
+    this.state.scene.unregisterBeforeRender(this.updater);
+    this.state.scene = null;
   }
 }

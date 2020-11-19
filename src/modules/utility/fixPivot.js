@@ -1,11 +1,11 @@
-
-// works on the X Z plane only
-export function fixPivotPointOffCentre(mesh, y ) {
-
     // kludge to move the pivot point from world centre to
     // to local centre
     // adapted from the solution described here
     // https://forum.babylonjs.com/t/rotate-a-importet-mesh-will-not-work-correctly/3059
+
+
+// works on the X Z plane only
+export function fixPivotPointOffCentre(mesh, y ) {
 
     // get the centre of the bounding box in world space
     // which gives us a translation vector

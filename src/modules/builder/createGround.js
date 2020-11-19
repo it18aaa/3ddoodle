@@ -8,7 +8,9 @@ import { BoundingInfo } from "@babylonjs/core/Culling/boundingInfo";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { fixPivotPointOffCentre } from '../utility/fixPivot';
 
-export function createGroundPolygon(scene, outline, groundLevel) {
+export function createGroundPolygon(scene, outline, groundLevel) {    
+
+    console.log("outline is ", outline)
     if (outline.getLines().length > 2) {
         const corners = [];
         outline.getLines().forEach((line) => {

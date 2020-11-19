@@ -12,16 +12,16 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 const groundLevel = new GroundLevel();
 const url = "http://localhost:3000/";
 
-export function initGroundController(eventBus, scene, outline) {  
+export function initGroundController(eventBus, state, outline) {  
     
     eventBus.subscribe(EVENTS.CREATE_GROUND, details => {        
-
+  
         // if material exists already, get a ref to it
         // otherwise load it  
         const materialName = "groundMaterial" + details.texture.name;
-        let material = scene.getMaterialByName(materialName);
+        let material = state.scene.getMaterialByName(materialName);
         if (!material) {
-            material = new StandardMaterial(materialName, scene);
+            material = new StandardMaterial(materialName, state.scene);
             const textureURL = url + details.texture.path + details.texture.file;
             // console.log("TextureURL: ", textureURL);
             material.diffuseTexture = new Texture(textureURL);
@@ -32,7 +32,7 @@ export function initGroundController(eventBus, scene, outline) {
         }
 
         // get a polygon
-        const poly = createGroundPolygon(scene, outline, groundLevel);
+        const poly = createGroundPolygon(state.scene, outline, groundLevel);
 
         poly.material = material;
 

@@ -12,6 +12,10 @@ export class GroundLevel {
     get() {
         return this.level;
     }
+
+    set(val) {
+        this.level = val;
+    }
     reset() {
         this.level = this.incrementSize;
     }

@@ -28,12 +28,12 @@ import {
     Counter 
 } from "../utility/counter";
 
-export function initModelController(eventBus, scene, outline, shadowGenerator, url, adt) {
+export function initModelController(eventBus, state, outline, shadowGenerator, url, adt) {
     
     // a counter for unique naming, and a utility layer for 
     // labels
     const counter = new Counter();
-    const utilityLayer = new UtilityLayerRenderer(scene);
+    const utilityLayer = new UtilityLayerRenderer(state.scene);
 
     // drag behaviour for garden items!
     const pointerDragBehavior = new PointerDragBehavior({
@@ -50,8 +50,8 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
 
 
     // initialise events for ground material and fences...
-    initGroundController(eventBus, scene, outline);
-    initFenceController(eventBus, scene, outline, shadowGenerator);
+    initGroundController(eventBus, state, outline);
+    initFenceController(eventBus, state, outline, shadowGenerator);
 
     // label for drag and drop
     let modelLabel = makeModelLabel("");
@@ -66,7 +66,7 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
     // rotation gizmo
     eventBus.subscribe(EVENTS.MODEL_SELECT, item => {        
         selected = item.id;
-        const mesh = scene.getMeshByUniqueID(item.id);
+        const mesh = state.scene.getMeshByUniqueID(item.id);
         mesh.addBehavior(pointerDragBehavior);
         gizmo.attachedMesh = mesh;        
         modelLabel.text = mesh.name;
@@ -80,7 +80,7 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
     eventBus.subscribe(EVENTS.MODEL_UNSELECT, item => {
         if(selected) {
             selected = null;
-            const mesh = scene.getMeshByUniqueID(item.id);
+            const mesh = state.scene.getMeshByUniqueID(item.id);
             mesh.removeBehavior(mesh.getBehaviorByName("PointerDrag"));
             gizmo.attachedMesh = null;
             modelLabel.text = "";
@@ -103,7 +103,7 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
     eventBus.subscribe(EVENTS.DELETE_REQUEST, ()=> {
         // do we have a model selected?
         if(selected) {
-            const mesh = scene.getMeshByUniqueID(selected);
+            const mesh = state.scene.getMeshByUniqueID(selected);
             eventBus.dispatch(EVENTS.DELETE_CONFIRM, 
                 {
                     id: selected,
@@ -116,13 +116,13 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
 
     eventBus.subscribe(EVENTS.DELETE_DO, item => {
         console.log("Delete ", item);
-        const unselected = scene.getMeshByUniqueID(item.id);
+        const unselected = state.scene.getMeshByUniqueID(item.id);
         unselected.removeBehavior(unselected.getBehaviorByName("PointerDrag"));
         selected = null;
         modelLabel.text = "";
         modelLabel.isVisible = false;
         gizmo.attachedMesh =null;
-        scene.removeMesh(unselected);
+        state.scene.removeMesh(unselected);
         unselected.dispose();
     });
 
@@ -131,7 +131,7 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
 
         // check if model loaded, if so, create instance
         // otherwise load up the mesh
-        const mesh = scene.getMeshByName(item.model.name);
+        const mesh = state.scene.getMeshByName(item.model.name);
         if (mesh) {
             // mesh already exists, creating instance of it!
             counter.increment();
@@ -148,7 +148,7 @@ export function initModelController(eventBus, scene, outline, shadowGenerator, u
                 "",
                 url + item.model.path,
                 item.model.file,
-                scene,
+                state.scene,
                 (meshes) => {
                     console.log(meshes)
                     // get our parent mesh... the parent...

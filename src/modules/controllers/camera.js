@@ -14,9 +14,11 @@ export function getCameraActive(camera) {
     return camera.inputs.attachedElement ? true : false;
 }
 
+export function initCameraController(icamera, canvas, eventBus, scene, state) {
 
-export function initCameraController(camera, canvas, eventBus, scene) {
+    const camera = scene.activeCamera;
 
+    
     // attach camera to scene to start off with...
     camera.attachControl(canvas, false);
 
@@ -24,7 +26,7 @@ export function initCameraController(camera, canvas, eventBus, scene) {
     // change between orthographic and perspective view
     //
     eventBus.subscribe(EVENTS.GUI_CAMERA_ORTHO, (payload) => {
-
+        const camera = scene.activeCamera;
         if (camera.mode == Camera.PERSPECTIVE_CAMERA) {
             // TODO: hardcoded vars
             const distance = payload && payload.distance ? payload.distance : 26;
@@ -47,6 +49,7 @@ export function initCameraController(camera, canvas, eventBus, scene) {
 
     // change to perspective mode
     eventBus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {
+        const camera = scene.activeCamera;
         if (camera.mode == Camera.ORTHOGRAPHIC_CAMERA) {
             camera.mode = Camera.PERSPECTIVE_CAMERA;
         } else {
@@ -59,6 +62,7 @@ export function initCameraController(camera, canvas, eventBus, scene) {
     // CAMERA OPTIONS... this event is a cry for info
     // from the gui, so we send back info!
     eventBus.subscribe(EVENTS.GUI_CAMERA_OPTIONS, () => {
+        const camera = scene.activeCamera;
         // get camera details to send back to gui
         const data = {};
         data.mode = camera.mode;
@@ -75,6 +79,7 @@ export function initCameraController(camera, canvas, eventBus, scene) {
 
     // CAMERA mode toggle button
     eventBus.subscribe(EVENTS.MODE_TOGGLE, () => {
+        const camera = scene.activeCamera;
         if (getCameraActive(camera)) {
             // detach mouse controls from camera
             // and set up drawing mode
@@ -88,18 +93,24 @@ export function initCameraController(camera, canvas, eventBus, scene) {
 
     // switch between camera mode and edit mode
     eventBus.subscribe(EVENTS.MODE_EDIT, () => {
+        const camera = state.scene.activeCamera;
         if (getCameraActive(camera)) {
             camera.detachControl(canvas);
         }
     });
 
     eventBus.subscribe(EVENTS.MODE_CAMERA, () => {
+        const camera = state.scene.activeCamera;
         camera.attachControl(canvas, true);
     });
 
 
     // listen for double click, focus the camera
     canvas.addEventListener("dblclick", function () {
+
+        const camera = state.scene.activeCamera;
+        const scene = state.scene;
+
         if (getCameraActive(camera)) {
             const picked = scene.pick(scene.pointerX, scene.pointerY);
             animateCameraTo(scene,

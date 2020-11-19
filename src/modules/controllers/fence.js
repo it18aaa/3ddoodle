@@ -21,7 +21,7 @@ import {
     setUVScale
 } from "../utility/setUVScale";
 
-export function initFenceController(eventBus, scene, outline, shadowGenerator) {
+export function initFenceController(eventBus, state, outline, shadowGenerator) {
 
     const counter = new Counter();
     const url = "http://localhost:3000/"
@@ -30,10 +30,10 @@ export function initFenceController(eventBus, scene, outline, shadowGenerator) {
     eventBus.subscribe(EVENTS.CREATE_FENCE, data => {
 
         const fenceMaterialName = "fenceMaterial" + data.fence.name;
-        let material = scene.getMaterialByName(fenceMaterialName);
+        let material = state.scene.getMaterialByName(fenceMaterialName);
 
         if (!material) {
-            material = new StandardMaterial(fenceMaterialName, scene);
+            material = new StandardMaterial(fenceMaterialName, state.scene);
             const textureURL = url + data.fence.path + data.fence.file;
             material.diffuseTexture = new Texture(textureURL);
             material.specularColor = new Color3(0.0, 0.0, 0.0);
@@ -43,7 +43,7 @@ export function initFenceController(eventBus, scene, outline, shadowGenerator) {
             material.diffuseTexture.hasAlpha = data.fence.hasAlpha;
         }
 
-        const fence = createFence2(scene, outline, data.fence.height, counter);
+        const fence = createFence2(state.scene, outline, data.fence.height, counter);
 
         fence.receiveShadows = true;
         shadowGenerator.addShadowCaster(fence);

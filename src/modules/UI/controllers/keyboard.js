@@ -22,14 +22,6 @@ export function initKeyboard(scene, bus) {
                     bus.dispatch(EVENTS.MODE_TOGGLE);
                     break;
             }
-        }
-
-        // if (kbInfo.type === KeyboardEventTypes.KEYUP) {
-        //     if (selected) {
-        //         shadowGenerator.removeShadowCaster(selected);
-        //         gizmo.attachedMesh = null;
-        //         scene.removeMesh(selected);
-        //     }
-        // }
+        }      
     });
 }
