@@ -6,7 +6,7 @@ import {
 } from "../../event/types";
 
 
-export function initMouseController(state, bus) {
+export function initMouseController(canvas, state, bus, outline) {
 
     let selected = null;
 
@@ -19,6 +19,29 @@ export function initMouseController(state, bus) {
     bus.subscribe(EVENTS.MODEL_UNSELECT, item=> {
         selected = null;
     });
+
+
+// listen for mouse right click, but if
+// only we're in string line mode ....
+canvas.addEventListener("contextmenu", () => {
+    const scene = state.scene;
+
+    // if (!getCameraActive(camera)) {
+    if (!state.scene.activeCamera.inputs.attachedElement) {
+        const picked = scene.pick(scene.pointerX, scene.pointerY);
+        if (
+            picked.pickedMesh &&
+            picked.pickedMesh.name.substring(0, 4) == "post"
+        ) {
+            outline.delFencePostByName(picked.pickedMesh.name);
+        } else {
+            outline.addFencePost(picked.pickedPoint);
+        }
+    }
+});
+
+
+
 
     // to see if controls are attached ... 
     // camera.inputs.attachedElement

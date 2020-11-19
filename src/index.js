@@ -3,27 +3,54 @@
 import "@babylonjs/core/Culling/ray";
 import "core-js";
 import "regenerator-runtime/runtime";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { createCamera, createOutlineScene } from "./modules/builder/scene";
-import { StringLine } from "./modules/builder/stringLine";
-import { EventBus } from "./modules/event/eventBus";
-import { EVENTS } from "./modules/event/types";
-import { initUI } from "./modules/UI";
+import {
+    Engine
+} from "@babylonjs/core/Engines/engine";
+import {
+    AdvancedDynamicTexture
+} from "@babylonjs/gui/2D/advancedDynamicTexture";
+import {
+    createCamera,
+    createOutlineScene
+} from "./modules/builder/scene";
+import {
+    StringLine
+} from "./modules/builder/stringLine";
+import {
+    EventBus
+} from "./modules/event/eventBus";
+import {
+    EVENTS
+} from "./modules/event/types";
+import {
+    initUI
+} from "./modules/UI";
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
-import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
+import {
+    HighlightLayer
+} from "@babylonjs/core/Layers/highlightLayer";
 
-import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
+import {
+    ShadowGenerator
+} from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import {
     initCameraController,
     getCameraActive,
 } from "./modules/controllers/camera";
 
-import { initModelController } from "./modules/controllers/model";
-import { initKeyboard } from "./modules/UI/controllers/keyboard";
-import { initMouseController } from "./modules/UI/controllers/mouse";
-import { initFileController } from "./modules/controllers/file";
+import {
+    initModelController
+} from "./modules/controllers/model";
+import {
+    initKeyboard
+} from "./modules/UI/controllers/keyboard";
+import {
+    initMouseController
+} from "./modules/UI/controllers/mouse";
+import {
+    initFileController
+} from "./modules/controllers/file";
 
 const state = {};
 
@@ -74,8 +101,8 @@ function init(engine, camera, eventBus, canvas, state, shadowGenerator, outline,
         "http://localhost:3000",
         adt
     );
-    initKeyboard(state.scene, eventBus);
-    initMouseController(state, eventBus);
+    initKeyboard(state, eventBus);
+    initMouseController(canvas, state, eventBus, outline);
     initFileController(state, eventBus, engine); // pass in state
     initUI(eventBus);
 }
@@ -106,22 +133,7 @@ eventBus.subscribe(EVENTS.GUI_DEBUG, () => {
     }
 });
 
-// listen for mouse right click, but if
-// only we're in string line mode ....
-canvas.addEventListener("contextmenu", () => {
-    const scene = state.scene;
-    if (!getCameraActive(camera)) {
-        const picked = scene.pick(scene.pointerX, scene.pointerY);
-        if (
-            picked.pickedMesh &&
-            picked.pickedMesh.name.substring(0, 4) == "post"
-        ) {
-            outline.delFencePostByName(picked.pickedMesh.name);
-        } else {
-            outline.addFencePost(picked.pickedPoint);
-        }
-    }
-});
+
 
 // set a default mode
 eventBus.dispatch(EVENTS.MODE_EDIT);

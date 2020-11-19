@@ -16,7 +16,7 @@ export function getCameraActive(camera) {
 
 export function initCameraController(icamera, canvas, eventBus, scene, state) {
 
-    const camera = scene.activeCamera;
+    const camera = state.scene.activeCamera;
 
     
     // attach camera to scene to start off with...
@@ -26,7 +26,7 @@ export function initCameraController(icamera, canvas, eventBus, scene, state) {
     // change between orthographic and perspective view
     //
     eventBus.subscribe(EVENTS.GUI_CAMERA_ORTHO, (payload) => {
-        const camera = scene.activeCamera;
+        const camera = state.scene.activeCamera;
         if (camera.mode == Camera.PERSPECTIVE_CAMERA) {
             // TODO: hardcoded vars
             const distance = payload && payload.distance ? payload.distance : 26;
@@ -49,7 +49,7 @@ export function initCameraController(icamera, canvas, eventBus, scene, state) {
 
     // change to perspective mode
     eventBus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {
-        const camera = scene.activeCamera;
+        const camera = state.scene.activeCamera;
         if (camera.mode == Camera.ORTHOGRAPHIC_CAMERA) {
             camera.mode = Camera.PERSPECTIVE_CAMERA;
         } else {
@@ -62,7 +62,7 @@ export function initCameraController(icamera, canvas, eventBus, scene, state) {
     // CAMERA OPTIONS... this event is a cry for info
     // from the gui, so we send back info!
     eventBus.subscribe(EVENTS.GUI_CAMERA_OPTIONS, () => {
-        const camera = scene.activeCamera;
+        const camera = state.scene.activeCamera;
         // get camera details to send back to gui
         const data = {};
         data.mode = camera.mode;
@@ -72,14 +72,14 @@ export function initCameraController(icamera, canvas, eventBus, scene, state) {
             data.distance = camera.orthoRight * 3;
         }
         data.aspect =
-            scene.getEngine().getRenderingCanvasClientRect().height /
-            scene.getEngine().getRenderingCanvasClientRect().width;
+           state.scene.getEngine().getRenderingCanvasClientRect().height /
+            state.scene.getEngine().getRenderingCanvasClientRect().width;
         eventBus.dispatch(EVENTS.CAMERA_INFO, data);
     });
 
     // CAMERA mode toggle button
     eventBus.subscribe(EVENTS.MODE_TOGGLE, () => {
-        const camera = scene.activeCamera;
+        const camera = state.scene.activeCamera;
         if (getCameraActive(camera)) {
             // detach mouse controls from camera
             // and set up drawing mode

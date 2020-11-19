@@ -24,6 +24,17 @@ export class EventBus {
     // not yet implemented as not sure required?
   }
 
+  list() {
+    Object.values(EVENTS).forEach(event => {
+        console.log(event)
+        if(this.#subscribers[event]) {
+            Object.keys(this.#subscribers[event]).forEach((id) =>
+            console.log(`${this.#subscribers[event][id]}`)
+        );
+        }            
+    })
+}
+
   dispatch(type, payload) {
     // check the event type first, otherwise complain and do nothing
     if (EVENTS.hasOwnProperty(type)) {

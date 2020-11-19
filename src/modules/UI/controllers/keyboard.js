@@ -6,10 +6,10 @@ import {
 } from "@babylonjs/core/Events/keyboardEvents";
 
 
-export function initKeyboard(scene, bus) {
+export function initKeyboard(state, bus) {
 
     // keyboard behaviour
-    scene.onKeyboardObservable.add((kbInfo) => {
+    state.scene.onKeyboardObservable.add((kbInfo) => {
         if (kbInfo.type === KeyboardEventTypes.KEYUP) {
             switch (kbInfo.event.key) {
                 case "Delete":
