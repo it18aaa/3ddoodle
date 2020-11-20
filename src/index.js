@@ -51,6 +51,7 @@ import {
 import {
     initFileController
 } from "./modules/controllers/file";
+import { initScene } from "./modules/controllers/scene";
 
 const state = {};
 
@@ -73,6 +74,7 @@ const adt = new AdvancedDynamicTexture.CreateFullscreenUI(
     true,
     state.scene
 );
+state.adt = adt;
 const camera = createCamera(canvas, state.scene);
 const shadowGenerator = new ShadowGenerator(
     2048,
@@ -90,6 +92,7 @@ const showfps = 1;
 // init the string-line, this is the principle tool for modifying our
 // garden
 const outline = new StringLine(state, adt, false, eventBus);
+state.outline = outline;
 
 function init(engine, camera, eventBus, canvas, state, shadowGenerator, outline, adt) {
     initCameraController(camera, canvas, eventBus, state.scene, state);
@@ -104,6 +107,7 @@ function init(engine, camera, eventBus, canvas, state, shadowGenerator, outline,
     initKeyboard(state, eventBus);
     initMouseController(canvas, state, eventBus, outline);
     initFileController(state, eventBus, engine); // pass in state
+    initScene(state, eventBus);
     initUI(eventBus);
 }
 
@@ -120,7 +124,7 @@ eventBus.subscribe(EVENTS.GUI_LENGTH_BUTTON, () => {
 });
 
 // CLEAR BUTTON - resents the stringline
-eventBus.subscribe(EVENTS.GUI_CLEAR, () => {
+eventBus.subscribe(EVENTS.GUI_CLEAR_STRINGLINE, () => {
     outline.reset();
 });
 

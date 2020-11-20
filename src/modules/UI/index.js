@@ -29,6 +29,7 @@ import {
 import { ConfirmDeleteDialog } from "./dialogs/confirmDeleteDialog";
 import { OpenDialog } from "./dialogs/openDialog";
 import { SaveDialog } from "./dialogs/saveDialog";
+import { ConfirmClearDialog } from "./dialogs/confirmClearDialog";
 
 
 // Initialise the user interface - draw all the buttons and dialogs
@@ -39,6 +40,8 @@ export function initUI(bus) {
     // namespace our dialogs
     const dialogs = {};
 
+    dialogs.clear = new ConfirmClearDialog("dlgClear", "Clear design", bus);
+    dialogs.clear.render();
 
     dialogs.open = new OpenDialog("dlgOpen", "Open Design", bus);
     dialogs.open.render();
@@ -79,8 +82,16 @@ export function initUI(bus) {
 
     // legacy buttons -
     button("btnDebug", "debug");   
-    button("btnClear", "Clear");
+    // button("btnClear", "Clear");
 
+    button2("btnClear", "Clear", bus, ()=> {
+        bus.dispatch(EVENTS.CLEAR_REQUEST);
+    })
+
+    // as keep the function call to one place
+    bus.subscribe(EVENTS.CLEAR_REQUEST, ()=> {
+        dialogs.clear.show();
+    });
 
     button2("btnOpen", "Open", bus, ()=>{
         dialogs.open.update(null);
@@ -92,6 +103,9 @@ export function initUI(bus) {
         dialogs.save.show();
     } )
 
+    button2("btnClearStringline", "Clear Line", bus, ()=> {
+        bus.dispatch(EVENTS.GUI_CLEAR_STRINGLINE);
+    })
 
     // measure lengths buttons
     button2("btnLength", "Measurements", bus, () => {
@@ -167,11 +181,6 @@ export function initUI(bus) {
         },
         "button-container"
     );
-
-    $("#btnClear").on("click", () => {
-        bus.dispatch(EVENTS.GUI_CLEAR);
-    });
-
 
     $("#btnDebug").on("click", () => {
         bus.dispatch(EVENTS.GUI_DEBUG);

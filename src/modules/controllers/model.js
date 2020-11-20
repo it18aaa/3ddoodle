@@ -168,7 +168,8 @@ export function initModelController(eventBus, state, outline, shadowGenerator, u
                     });
                 });
         }
-    })
+    });
+
 }
 
 function makeModelLabel(name) {
