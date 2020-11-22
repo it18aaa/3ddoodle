@@ -8,7 +8,7 @@ import {
     rangeSlider
 } from "./components";
 import $ from "jquery";
-import {
+import { 
     Dialog
 } from "./dialogs/dialog";
 import {
@@ -78,7 +78,7 @@ export function initUI(bus) {
 
     $(".button-container").remove();
 
-    $("body").append('<div class="button-container">Garden Designer! </div>');
+    $("body").append('<div class="button-container"></div>');
 
     // legacy buttons -
     button("btnDebug", "debug");   

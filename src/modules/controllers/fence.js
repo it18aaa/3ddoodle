@@ -21,13 +21,13 @@ import {
     setUVScale
 } from "../utility/setUVScale";
 
-export function initFenceController(eventBus, state, outline, shadowGenerator) {
+export function initFenceController(state) {
 
     const counter = new Counter();
     const url = "http://localhost:3000/"
 
 
-    eventBus.subscribe(EVENTS.CREATE_FENCE, data => {
+    state.bus.subscribe(EVENTS.CREATE_FENCE, data => {
 
         const fenceMaterialName = "fenceMaterial" + data.fence.name;
         let material = state.scene.getMaterialByName(fenceMaterialName);
@@ -43,12 +43,12 @@ export function initFenceController(eventBus, state, outline, shadowGenerator) {
             material.diffuseTexture.hasAlpha = data.fence.hasAlpha;
         }
 
-        const fence = createFence2(state.scene, outline, data.fence.height, counter);
+        const fence = createFence2(state.scene, state.outline, data.fence.height, counter);
 
         fence.receiveShadows = true;
-        shadowGenerator.addShadowCaster(fence);
+        state.shadowGenerator.addShadowCaster(fence);
         // change UV Kind so texture in proportion to size of mesh
-        setUVScale(fence, outline.totalLength, 2);
+        setUVScale(fence, state.outline.totalLength, 2);
         // apply the material 
         fence.material = material;
     });

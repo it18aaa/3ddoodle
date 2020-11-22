@@ -14,18 +14,18 @@ export function getCameraActive(camera) {
     return camera.inputs.attachedElement ? true : false;
 }
 
-export function initCameraController(icamera, canvas, eventBus, scene, state) {
+export function initCameraController(state) {
 
     const camera = state.scene.activeCamera;
 
     
     // attach camera to scene to start off with...
-    camera.attachControl(canvas, false);
+    camera.attachControl(state.canvas, false);
 
     //  CAMERA ORIENTATED EVENTS>...
     // change between orthographic and perspective view
     //
-    eventBus.subscribe(EVENTS.GUI_CAMERA_ORTHO, (payload) => {
+    state.bus.subscribe(EVENTS.GUI_CAMERA_ORTHO, (payload) => {
         const camera = state.scene.activeCamera;
         if (camera.mode == Camera.PERSPECTIVE_CAMERA) {
             // TODO: hardcoded vars
@@ -38,8 +38,8 @@ export function initCameraController(icamera, canvas, eventBus, scene, state) {
 
         function setOrthoMode(distance) {
             const aspect =
-                scene.getEngine().getRenderingCanvasClientRect().height /
-                scene.getEngine().getRenderingCanvasClientRect().width;
+               state.scene.getEngine().getRenderingCanvasClientRect().height /
+                state.scene.getEngine().getRenderingCanvasClientRect().width;
             camera.orthoLeft = -distance / 3;
             camera.orthoRight = distance / 3;
             camera.orthoBottom = camera.orthoLeft * aspect;
@@ -48,7 +48,7 @@ export function initCameraController(icamera, canvas, eventBus, scene, state) {
     });
 
     // change to perspective mode
-    eventBus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {
+    state.bus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {
         const camera = state.scene.activeCamera;
         if (camera.mode == Camera.ORTHOGRAPHIC_CAMERA) {
             camera.mode = Camera.PERSPECTIVE_CAMERA;
@@ -61,7 +61,7 @@ export function initCameraController(icamera, canvas, eventBus, scene, state) {
 
     // CAMERA OPTIONS... this event is a cry for info
     // from the gui, so we send back info!
-    eventBus.subscribe(EVENTS.GUI_CAMERA_OPTIONS, () => {
+    state.bus.subscribe(EVENTS.GUI_CAMERA_OPTIONS, () => {
         const camera = state.scene.activeCamera;
         // get camera details to send back to gui
         const data = {};
@@ -74,39 +74,39 @@ export function initCameraController(icamera, canvas, eventBus, scene, state) {
         data.aspect =
            state.scene.getEngine().getRenderingCanvasClientRect().height /
             state.scene.getEngine().getRenderingCanvasClientRect().width;
-        eventBus.dispatch(EVENTS.CAMERA_INFO, data);
+        state.bus.dispatch(EVENTS.CAMERA_INFO, data);
     });
 
     // CAMERA mode toggle button
-    eventBus.subscribe(EVENTS.MODE_TOGGLE, () => {
+    state.bus.subscribe(EVENTS.MODE_TOGGLE, () => {
         const camera = state.scene.activeCamera;
         if (getCameraActive(camera)) {
             // detach mouse controls from camera
             // and set up drawing mode
-            eventBus.dispatch(EVENTS.MODE_EDIT);
+            state.bus.dispatch(EVENTS.MODE_EDIT);
         } else {
             // kill drawing mode and attach
             // mouse input to camera...
-            eventBus.dispatch(EVENTS.MODE_CAMERA);
+            state.bus.dispatch(EVENTS.MODE_CAMERA);
         }
     });
 
     // switch between camera mode and edit mode
-    eventBus.subscribe(EVENTS.MODE_EDIT, () => {
+    state.bus.subscribe(EVENTS.MODE_EDIT, () => {
         const camera = state.scene.activeCamera;
         if (getCameraActive(camera)) {
-            camera.detachControl(canvas);
+            camera.detachControl(state.canvas);
         }
     });
 
-    eventBus.subscribe(EVENTS.MODE_CAMERA, () => {
+    state.bus.subscribe(EVENTS.MODE_CAMERA, () => {
         const camera = state.scene.activeCamera;
-        camera.attachControl(canvas, true);
+        camera.attachControl(state.canvas, true);
     });
 
 
     // listen for double click, focus the camera
-    canvas.addEventListener("dblclick", function () {
+    state.canvas.addEventListener("dblclick", function () {
 
         const camera = state.scene.activeCamera;
         const scene = state.scene;

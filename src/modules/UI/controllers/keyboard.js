@@ -6,7 +6,7 @@ import {
 } from "@babylonjs/core/Events/keyboardEvents";
 
 
-export function initKeyboard(state, bus) {
+export function initKeyboard(state) {
 
     // keyboard behaviour
     state.scene.onKeyboardObservable.add((kbInfo) => {
@@ -14,12 +14,11 @@ export function initKeyboard(state, bus) {
             switch (kbInfo.event.key) {
                 case "Delete":
                 case "Backspace":
-                    bus.dispatch(EVENTS.DELETE_REQUEST);
+                    state.bus.dispatch(EVENTS.DELETE_REQUEST);
                     break
                 case "m":
-                case "M":
-                    console.log("mmmmmmm")
-                    bus.dispatch(EVENTS.MODE_TOGGLE);
+                case "M":                    
+                    state.bus.dispatch(EVENTS.MODE_TOGGLE);
                     break;
             }
         }      
