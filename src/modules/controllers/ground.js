@@ -1,4 +1,4 @@
-import { GroundLevel } from "../utility/groundLevel";
+
 import { EVENTS } from '../event/types';
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -8,13 +8,9 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 
-// this increases as new ground items are added...
-const groundLevel = new GroundLevel();
-const url = "http://localhost:3000/";
-
-export function initGroundController(eventBus, state, outline) {  
+export function initGroundController(state) {  
     
-    eventBus.subscribe(EVENTS.CREATE_GROUND, details => {        
+    state.bus.subscribe(EVENTS.CREATE_GROUND, details => {        
   
         // if material exists already, get a ref to it
         // otherwise load it  
@@ -22,7 +18,7 @@ export function initGroundController(eventBus, state, outline) {
         let material = state.scene.getMaterialByName(materialName);
         if (!material) {
             material = new StandardMaterial(materialName, state.scene);
-            const textureURL = url + details.texture.path + details.texture.file;
+            const textureURL = state.url + details.texture.path + details.texture.file;
             // console.log("TextureURL: ", textureURL);
             material.diffuseTexture = new Texture(textureURL);
             material.specularColor = new Color3(0.0, 0.0, 0.0);
@@ -32,12 +28,12 @@ export function initGroundController(eventBus, state, outline) {
         }
 
         // get a polygon
-        const poly = createGroundPolygon(state.scene, outline, groundLevel);
+        const poly = createGroundPolygon(state.scene, state.outline, state.groundLevel.get());
 
         poly.material = material;
 
         // micro increment ground level
-        groundLevel.increment();
+        state.groundLevel.increment();
     });
 }
 

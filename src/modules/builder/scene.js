@@ -72,17 +72,17 @@ export const createOutlineScene = function (engine) {
   ground.material = gridMaterial;
 
 
-  const woodenFenceMaterial = new StandardMaterial("woodFence", scene);
-  woodenFenceMaterial.diffuseTexture = new Texture("/img/wood.jpg")
-  woodenFenceMaterial.diffuseTexture.uScale = 1;
-  woodenFenceMaterial.diffuseTexture.vScale = 1;
+//   const woodenFenceMaterial = new StandardMaterial("woodFence", scene);
+//   woodenFenceMaterial.diffuseTexture = new Texture("/img/wood.jpg")
+//   woodenFenceMaterial.diffuseTexture.uScale = 1;
+//   woodenFenceMaterial.diffuseTexture.vScale = 1;
 
-  const fenceMat = new StandardMaterial("fence", scene);
-  fenceMat.diffuseTexture = new Texture("/img/fence3.png");
-  fenceMat.diffuseTexture.uScale = .5;
-  fenceMat.diffuseTexture.vScale = .5;
-  fenceMat.diffuseTexture.hasAlpha = true;
-  fenceMat.backFaceCulling = true;
+//   const fenceMat = new StandardMaterial("fence", scene);
+//   fenceMat.diffuseTexture = new Texture("/img/fence3.png");
+//   fenceMat.diffuseTexture.uScale = .5;
+//   fenceMat.diffuseTexture.vScale = .5;
+//   fenceMat.diffuseTexture.hasAlpha = true;
+//   fenceMat.backFaceCulling = true;
 
   return scene;
 }

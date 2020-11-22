@@ -18,14 +18,14 @@ export function createGroundPolygon(scene, outline, groundLevel) {
         });
         //TODO: create a better naming scheme
         const polygon_triangulation = new PolygonMeshBuilder(
-            "GroundCover" + groundLevel.get(),
+            "GroundCover" + groundLevel,
             corners,
             scene,
             EarcutRef
         );
 
         const polygon = polygon_triangulation.build(false);
-        polygon.position.y = groundLevel.get();
+        polygon.position.y = groundLevel;
 
         polygon.receiveShadows = true;
 
@@ -36,7 +36,7 @@ export function createGroundPolygon(scene, outline, groundLevel) {
             outline.getExtents().width
         );
 
-        fixPivotPointOffCentre(polygon, groundLevel.get());
+        fixPivotPointOffCentre(polygon, groundLevel);
 
         return polygon;
     }

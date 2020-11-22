@@ -278,7 +278,7 @@ export class StringLine {
   }
 
   updateMesh() {
-    this.linesMesh = MeshBuilder.CreateLines(null, {
+    this.linesMesh = MeshBuilder.CreateLines("stringline-lines", {
       points: this.getLines(),
       instance: this.linesMesh,
     });
