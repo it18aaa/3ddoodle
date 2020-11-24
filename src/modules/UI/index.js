@@ -5,7 +5,8 @@ import {
 import {
     button,
     button2,
-    rangeSlider
+    rangeSlider,
+    slider2
 } from "./components";
 import $ from "jquery";
 import { 
@@ -30,7 +31,9 @@ import { ConfirmDeleteDialog } from "./dialogs/confirmDeleteDialog";
 import { OpenDialog } from "./dialogs/openDialog";
 import { SaveDialog } from "./dialogs/saveDialog";
 import { ConfirmClearDialog } from "./dialogs/confirmClearDialog";
-
+import { LocationDialog } from "./dialogs/locationDialog";
+import { timeSlider } from "./components";
+import { dateSlider } from "./components";
 
 // Initialise the user interface - draw all the buttons and dialogs
 export function initUI(bus) {
@@ -39,6 +42,9 @@ export function initUI(bus) {
 
     // namespace our dialogs
     const dialogs = {};
+
+    dialogs.location = new LocationDialog("dlgLocation", "Location", bus);
+    dialogs.location.render();
 
     dialogs.clear = new ConfirmClearDialog("dlgClear", "Clear design", bus);
     dialogs.clear.render();
@@ -79,6 +85,7 @@ export function initUI(bus) {
     $(".button-container").remove();
 
     $("body").append('<div class="button-container"></div>');
+    $("body").append('<div class="sun-control-container"></div>');
 
     // legacy buttons -
     button("btnDebug", "debug");   
@@ -151,7 +158,6 @@ export function initUI(bus) {
         $("#iconeye").fadeIn(200);
     });
 
-
     bus.subscribe(EVENTS.DELETE_CONFIRM, (item) => {        
         dialogs.confirmDelete.update(item);
         dialogs.confirmDelete.show();
@@ -173,6 +179,22 @@ export function initUI(bus) {
         dialogs.fence.update();
         dialogs.fence.show();
     })
+
+  
+
+    timeSlider("rngTime", "Time", (time)=>{
+        bus.dispatch(EVENTS.TIME_SET, time);
+    }, "sun-control-container");
+
+    dateSlider("rngDate", "Date", (date)=>{
+        bus.dispatch(EVENTS.DATE_SET, date);
+    }, "sun-control-container");
+
+    button2("btnLocationDialog", "Location", bus, ()=>{
+        dialogs.location.show();
+
+    }, "sun-control-container");
+
 
     // Manage the Camera Options Dialog
     // Open the dialog, update the

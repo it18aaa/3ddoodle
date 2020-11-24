@@ -54,7 +54,7 @@ export class EventBus {
                 this.#subscribers[type][id](payload)
             );
         } else {
-            throw `Unknown event: ` + type.toString();
+            throw `Unknown event ${type}`;
         }
     }
 }
