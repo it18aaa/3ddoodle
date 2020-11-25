@@ -47,7 +47,7 @@ export const createOutlineScene = function (engine) {
         new Vector3(-11, 15, 0),
         scene
     );
-    light.intensity = 0.16;
+    light.intensity = 0.12;
 
     const sunlight = new DirectionalLight("sun", new Vector3(0, -40, 0), scene);
     sunlight.intensity = 2;
@@ -67,8 +67,8 @@ export const createOutlineScene = function (engine) {
     skybox.material = skyMaterial;
     skyMaterial.useSunPosition = true;
     skyMaterial.sunPosition = new Vector3(0, 100, 0);
-    skyMaterial.luminance = 1;
-    skyMaterial.turbidity = 2;
+    skyMaterial.luminance = 0.4;
+    skyMaterial.turbidity = 1;
     skyMaterial.rayleigh = 1;
 
     // skyMaterial.mieDirectionalG = 0.8;
