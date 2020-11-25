@@ -26,6 +26,9 @@ export function initSunController(state) {
 
     state.sunOffset = Math.PI/2 // for some reason sun is 90degrees cw out
 
+    
+
+
     state.bus.subscribe(EVENTS.LOCATION_SET, (location) => {
         state.location = location;
         updateDateAndLocation(state);        
@@ -60,18 +63,22 @@ function updateSunLight(state) {
         state.sunOffset);
 
     const sun = state.scene.getLightByName("sun");
-
+    const skyMaterial = state.scene.getMaterialByName("skyMaterial");
+    
     // change direction vector of directional light 
     sun.direction = light.lightDir;
     // position in sky in appropriate place
-    sun.position = light.sunDir.scale(30);
+    sun.position = light.sunDir.scale(35);
 
     if(state.dateTime.getTime() < light.times.sunrise || state.dateTime.getTime() > light.times.sunset) {
-        sun.setEnabled(false);
+        sun.setEnabled(false);        
     } else {
-        sun.setEnabled(true);
+        sun.setEnabled(true);        
     }
     
+    // update the skybox material
+    skyMaterial.sunPosition = light.sunDir.scale(100);  
+
 }
 
 
@@ -123,7 +130,9 @@ export function getSunlightVector(date, lat, lon, offset) {
     return {
         times: times,
         sunDir: sunDirVector,
-        lightDir: lightDirVector
+        lightDir: lightDirVector,
+        azimuth: output.azimuth,
+        altitude: output.altitude
     };
 
 }
