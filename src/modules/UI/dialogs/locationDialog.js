@@ -4,6 +4,8 @@ import { EVENTS } from "../../event/types";
 
 export class LocationDialog extends Dialog {
     lookupurl = "http://api.postcodes.io/postcodes/";
+    lat = 53.411815;
+    long = -2.98153;
 
     constructor(id, title, bus) {
         super(id, title, bus);
@@ -24,10 +26,10 @@ export class LocationDialog extends Dialog {
         </label>        
         <br /><br />  
         <label for='${this.id}lat' />Latitude: 
-        <input type='text' id='${this.id}lat' />
+        <input type='text' id='${this.id}lat' value="${this.lat}"/>
         </label>
         <label for='${this.id}lat' />Longitude:
-        <input type='text' id='${this.id}long' />         
+        <input type='text' id='${this.id}long' value="${this.long}"/>         
         </label>
     
       

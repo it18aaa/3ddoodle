@@ -70,7 +70,7 @@ export function datePicker(id, text, callback, container = "button-container") {
 
 
 export function dateSlider(id, text, callback, container = "button-container") {
-  const defaultDay = 10;
+  const defaultDay = 158;
   const d = dateFromNumber(defaultDay);
   const dateString = d.toLocaleDateString('en-GB',
     {

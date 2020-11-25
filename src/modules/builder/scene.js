@@ -45,11 +45,11 @@ export const createOutlineScene = function (engine) {
     new Vector3(-11, 15, 0),
     scene
   );
-  light.intensity = 0.5;
+  light.intensity = 0.1;
 
 
-  const sunlight = new DirectionalLight("sun", new Vector3(20,-20,20),scene)
-  sunlight.intensity = 0.9;
+  const sunlight = new DirectionalLight("sun", new Vector3(0,-40,0),scene)
+  sunlight.intensity = 1.8;
 
   // create a built in ground shape
   const ground = MeshBuilder.CreateGround(
@@ -57,7 +57,7 @@ export const createOutlineScene = function (engine) {
     {
       height: 50,
       width: 50,
-      subdivisions: 20,
+      subdivisions: 20,      
     },
     scene
   );
