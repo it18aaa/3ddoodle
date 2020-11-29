@@ -25,7 +25,8 @@
     "@babylonjs/materials": "^4.1.0",
     "@babylonjs/procedural-textures": "^4.1.0",
     "earcut": "^2.2.2",
-    "jquery": "^3.5.1"
+    "jquery": "^3.5.1",
+    "suncalc": "^1.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",

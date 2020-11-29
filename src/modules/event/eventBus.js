@@ -48,13 +48,13 @@ export class EventBus {
                 return;
             }
 
-            console.log(`Event: `, type, payload);
+            // console.log(`Event: `, type, payload);
 
             Object.keys(this.#subscribers[type]).forEach((id) =>
                 this.#subscribers[type][id](payload)
             );
         } else {
-            throw `Unknown event: ` + type.toString();
+            throw `Unknown event ${type}`;
         }
     }
 }

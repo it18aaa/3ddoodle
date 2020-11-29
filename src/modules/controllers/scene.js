@@ -42,7 +42,8 @@ export function initState(state) {
     state.utilityLayer = new UtilityLayerRenderer(state.scene);
     state.shadowGenerator = new ShadowGenerator(2048, state.scene.getLightByName("sun"));
     state.groundLevel = new GroundLevel();
-    state.shadowGenerator.usePoissonSampling = true;
+    // state.shadowGenerator.usePoissonSampling = true;
+    state.shadowGenerator.usePercentageCloserFiltering = true;
     state.outline = new StringLine(state, state.adt, false, state.bus);
     state.url = "http://localhost:3000";
     state.selected = null; // selected model

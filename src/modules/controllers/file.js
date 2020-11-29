@@ -3,6 +3,7 @@ import { SceneSerializer } from "@babylonjs/core/Misc/sceneSerializer";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { initEditor } from "./editor";
 import { initState } from "./scene"
+import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 export function initFileController(state) {
     // file event handlers
 
@@ -55,13 +56,27 @@ export function initFileController(state) {
         // get existing lights and cameras...
         const cam = state.scene.getCameraByName("camera1");
         const sun = state.scene.getLightByName("sun");
+        sun.dispose();
         const ground = state.scene.getMeshByName("ground1");
+        ground.dispose();
         const hemi = state.scene.getLightByName("hemiLight");
+        hemi.dispose();
+        const skybox = state.scene.getMeshByName("skyBox");
+        skybox.dispose();
+        const grid = state.scene.getMaterialByName("gridMaterial");
+        grid.dispose();
+        const sky = state.scene.getMaterialByName("skyMaterial");
+        sky.dispose();
 
         cam.name = "camera1-orig";
-        sun.name = "sun-orig";
-        hemi.name = "hemiLight-orig";
-        ground.name = "ground1-orig";
+        // sun.name = "sun-orig";
+        // hemi.name = "hemiLight-orig";
+        // ground.name = "ground1-orig";
+        // skybox.name = "skybox-orig";
+
+
+
+
 
         SceneLoader.AppendAsync( 
             "",            
@@ -91,9 +106,14 @@ export function initFileController(state) {
                
                 // get rid of new sun 
                 const newsun = state.scene.getLightByName("sun")
-                state.scene.removeLight(newsun);
-                newsun.dispose();
-                sun.name="sun"
+                // state.scene.removeLight(newsun);
+                // newsun.dispose();
+                // sun.name="sun"
+                
+                state.scene.removeLight(sun);
+                sun.dispose();
+
+                state.shadowGenerator = newsun.getShadowGenerator();
 
                 state.scene.removeLight(hemi);
                 hemi.dispose();
@@ -104,8 +124,8 @@ export function initFileController(state) {
                 const grid = state.scene.getMaterialByName("gridMaterial");
                 state.scene.getMeshByName("ground1").material = grid;
                 
-                state.groundLevel.set(state.scene.metadata.groundLevel);
-                
+                state.groundLevel.set(state.scene.metadata.groundLevel);                
+
                 state.bus.dispatch(EVENTS.MODE_CAMERA);
             });
 
