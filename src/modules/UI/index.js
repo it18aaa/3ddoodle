@@ -5,6 +5,7 @@ import {
 import {
     button,
     button2,
+    checkBox,
     rangeSlider,
     slider2
 } from "./components";
@@ -193,6 +194,13 @@ export function initUI(bus) {
     button2("btnLocationDialog", "Location", bus, ()=>{
         dialogs.location.show();
 
+    }, "sun-control-container");
+    checkBox("chkShadows", "Shadows", (shadows)=> {
+        if(shadows) {
+            bus.dispatch(EVENTS.SHADOWS_ON);
+        } else {
+            bus.dispatch(EVENTS.SHADOWS_OFF);
+        }
     }, "sun-control-container");
 
 

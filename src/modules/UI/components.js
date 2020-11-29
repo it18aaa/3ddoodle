@@ -163,3 +163,28 @@ export function timeSlider(id, text, callback, container = "button-container") {
     }
   }
 }
+
+export function checkBox(id, text, callback, container="button-container" ) {
+
+    let content  =  `
+        <label for "${id}">${text}
+            
+        </label>
+        <input id="${id}" type="checkbox" checked> 
+        
+    `
+
+    // render the content
+  $(`.${container}`).append(content);
+
+  $(`#${id}`).on('input', (ev) => {
+      
+    console.log($(`#${id}`).val());
+    if ( $(`#${id}`).prop("checked") ) {
+        callback(true);
+      } else {
+          callback(false);
+      }      
+  });
+
+}

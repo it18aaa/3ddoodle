@@ -47,6 +47,16 @@ export function initSunController(state) {
         updateDateAndLocation(state);
         updateSunLight(state);        
     });
+
+    state.bus.subscribe(EVENTS.SHADOWS_ON, ()=>{
+        console.log("shadows on!")
+        state.scene.shadowsEnabled = true;
+    });
+
+    state.bus.subscribe(EVENTS.SHADOWS_OFF, ()=>{
+        console.log("shadows off!")
+        state.scene.shadowsEnabled = false;
+    });
 }
 
 function updateDateAndLocation(state) {
