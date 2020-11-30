@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;900&display=swap" rel="stylesheet">
     <title>Document</title>
     <style>
-        
         html,
         body {
             overflow: hidden;
@@ -22,7 +21,7 @@
             height: 100%;
             touch-action: none;
         }
-
+ 
         #fps {
             position: absolute;
             background-color: black;
@@ -34,7 +33,8 @@
             right: 10px;
             width: 40px;
             height: 15px;
-        }
+            z-index: 1;
+        } 
 
         .button-container button {
             max-height: 30px;
@@ -42,9 +42,9 @@
             padding: 0.5em;
             margin-left: 4px;
             margin-right: 4px;
-            border-radius: 2px;
-            border: 1px solid rgb(255, 255, 255);            
-            font-size: normal;
+            border-radius: 2px;            
+            border: 1px solid rgb(255, 255, 255);
+            font-size: small;
         }
 
         .button-container button:hover {
@@ -54,41 +54,65 @@
         .button-container {
             font-family: 'Roboto', sans-serif;
             position: absolute;
-            top: 4px;
-            /* left: 350px;
-            right: 150px; */
-            padding-left: 5em;
-            
+            top: 0px;            
             left: 50%;
+            width: 100%;
             transform: translate(-50%, 0);
-            /* opacity: 0.94; */
+            text-align: center;
+            /* padding-left: 5em; */
             background-color: aliceblue;
             border-radius: 4px;
             padding: 3px;
         }
 
-        .sun-control-container {    
+
+        .gardenstyle {
             font-family: 'Roboto', sans-serif;
-            font-size: small;
-            position: absolute;
-            bottom: 4px;
-            /* left: 350px;
-            right: 150px; */
-            padding-left: 5em;            
-            left: 50%;
-            transform: translate(-50%, 0);
-            width: 50%;
-            /* opacity: 0.94; */
+            width: 100%;
             background-color: aliceblue;
-            border-radius: 4px;
-            padding: 3px;
+            /* padding-left: 5em; */
         }
 
-        input[type="range"] {
-            /* width: 100%;     */
+        .sun-control {
+            position: absolute;
+            bottom: 0px;
+            width: 100%;
+            left: 0px;
         }
-        
 
+/* 
+        .camera-control input[type="range"] {
+            -webkit-appearance: slider-vertical;
+            height: 300px;
+        } */
+
+        .left-control {
+            position: absolute;
+            left: 0px;
+            top: 100px;
+        }
+
+        .right-control {                        
+            position: absolute;                        
+            /* width: 80vh;             */
+            width: calc(100vh - 78px);
+            left: 100%;
+            top: 34px;             
+            transform-origin: top left;
+            transform: rotate(90deg);
+            background-color: aliceblue;
+            padding: 10px;
+            margin:0px;
+            
+        }
+
+        .right-control input[type="range"] {
+            width: 20vh;
+            
+        }
+        .sun-control input[type="range"] {
+            width: 20%;
+        }
 
         #topmenu {
             width: 100%;
@@ -99,7 +123,7 @@
             padding: 10px;
 
         }
-    
+
         .modal {
             font-family: 'Roboto', sans-serif;
             display: none;
@@ -118,7 +142,7 @@
         }
 
         .modal-title {
-           
+
             font-family: 'Roboto', sans-serif;
             font-size: 1.2em;
             padding-bottom: 1em;
@@ -129,7 +153,7 @@
             float: right;
             text-align: right;
             font-size: 1.5em;
-            
+
             padding-left: .4em;
             padding-right: .4em;
             border-radius: 4px;
@@ -175,7 +199,8 @@
         .button-active {
             background-color: green;
         }
-/*
+
+        /*
         .icon {
             position: absolute;
             width: 80px;
@@ -186,14 +211,14 @@
 */
         .insert-item-thumb {
             text-align: center;
-            
+
             float: left;
             width: 30%;
             height: 30%;
             padding-top: 10px;
             padding-bottom: 10px;
-            
-        }      
+
+        }
 
         .insert-item-thumb img:hover {
             cursor: pointer;
@@ -202,7 +227,6 @@
         .insert-item-thumb-selected {
             background-color: #b0f0e0;
         }
-
     </style>
 </head>
 

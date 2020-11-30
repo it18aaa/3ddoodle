@@ -22,6 +22,26 @@ export function initCameraController(state) {
     // attach camera to scene to start off with...
     camera.attachControl(state.canvas, false);
 
+    state.bus.subscribe(EVENTS.CAM_DISTANCE, (distance) => {    
+        const cam = state.scene.activeCamera;
+        if(cam.mode == Camera.PERSPECTIVE_CAMERA) {            
+            cam.radius = distance;
+        } else if(cam.mode == Camera.ORTHOGRAPHIC_CAMERA) {
+            setOrthoMode(cam, distance);
+        }        
+    });
+
+    state.bus.subscribe(EVENTS.CAM_FOV, (fov) => { 
+        const cam = state.scene.activeCamera;
+        if(cam.mode == Camera.PERSPECTIVE_CAMERA) {   
+            // set field of view, converting degrees to radians
+        state.scene.activeCamera.fov = fov*(Math.PI/180);
+        };
+    })
+
+
+
+
     //  CAMERA ORIENTATED EVENTS>...
     // change between orthographic and perspective view
     //
@@ -30,22 +50,28 @@ export function initCameraController(state) {
         if (camera.mode == Camera.PERSPECTIVE_CAMERA) {
             // TODO: hardcoded vars
             const distance = payload && payload.distance ? payload.distance : 26;
-            setOrthoMode(distance);
+            setOrthoMode(camera, distance);
             camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
         } else {
-            setOrthoMode(payload.distance);
+            setOrthoMode(camera, payload.distance);
         }
 
-        function setOrthoMode(distance) {
-            const aspect =
-               state.scene.getEngine().getRenderingCanvasClientRect().height /
-                state.scene.getEngine().getRenderingCanvasClientRect().width;
-            camera.orthoLeft = -distance / 3;
-            camera.orthoRight = distance / 3;
-            camera.orthoBottom = camera.orthoLeft * aspect;
-            camera.orthoTop = camera.orthoRight * aspect;
-        }
+        
     });
+
+
+    function setOrthoMode(camera, distance) {
+        const aspect =
+           state.scene.getEngine().getRenderingCanvasClientRect().height /
+            state.scene.getEngine().getRenderingCanvasClientRect().width;
+        camera.orthoLeft = -distance / 3;
+        camera.orthoRight = distance / 3;
+        camera.orthoBottom = camera.orthoLeft * aspect;
+        camera.orthoTop = camera.orthoRight * aspect;
+    }
+
+
+
 
     // change to perspective mode
     state.bus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {

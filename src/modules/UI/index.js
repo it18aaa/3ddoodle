@@ -35,6 +35,7 @@ import { ConfirmClearDialog } from "./dialogs/confirmClearDialog";
 import { LocationDialog } from "./dialogs/locationDialog";
 import { timeSlider } from "./components";
 import { dateSlider } from "./components";
+import { camSlider } from "./components";
 
 // Initialise the user interface - draw all the buttons and dialogs
 export function initUI(bus) {
@@ -84,13 +85,16 @@ export function initUI(bus) {
     // Object.entries(dialogs).forEach(obj=>{ obj.render() });
 
     $(".button-container").remove();
-
     $("body").append('<div class="button-container"></div>');
-    $("body").append('<div class="sun-control-container"></div>');
 
-    // legacy buttons -
-    button("btnDebug", "debug");   
-    // button("btnClear", "Clear");
+    const content = `    
+    <div class="gardenstyle sun-control"></div>
+    <div class="gardenstyle camera-control"></div>
+    <div class="camera-control left-control"></div>
+    <div class="camera-control right-control"></div>
+    `;
+
+    $("body").append(content);    
 
     button2("btnClear", "Clear", bus, ()=> {
         bus.dispatch(EVENTS.CLEAR_REQUEST);
@@ -167,8 +171,7 @@ export function initUI(bus) {
     button2("btnCreate", "Ground", bus, () => {
             dialogs.create.update();
             dialogs.create.show();
-        },
-        // "button-container"
+        },        
     );
 
     button2("btnInsert", "Items & Plants", bus, () => {
@@ -185,23 +188,41 @@ export function initUI(bus) {
 
     timeSlider("rngTime", "Time", (time)=>{
         bus.dispatch(EVENTS.TIME_SET, time);
-    }, "sun-control-container");
+    }, "sun-control");
 
     dateSlider("rngDate", "Date", (date)=>{
         bus.dispatch(EVENTS.DATE_SET, date);
-    }, "sun-control-container");
+    }, "sun-control");
 
     button2("btnLocationDialog", "Location", bus, ()=>{
         dialogs.location.show();
 
-    }, "sun-control-container");
+    }, "sun-control");
     checkBox("chkShadows", "Shadows", (shadows)=> {
         if(shadows) {
             bus.dispatch(EVENTS.SHADOWS_ON);
         } else {
             bus.dispatch(EVENTS.SHADOWS_OFF);
         }
-    }, "sun-control-container");
+    }, "sun-control");
+
+    checkBox("chkSky", "Sky", (sky)=> {
+        if(sky) {
+            bus.dispatch(EVENTS.SKY_ON);
+        }else{
+            bus.dispatch(EVENTS.SKY_OFF);        
+        }
+    }, "sun-control");
+
+
+    camSlider("rngCamDistance", "Dist:", 1, 100, 10, (dist) =>{        
+        bus.dispatch(EVENTS.CAM_DISTANCE, dist)
+    }, "right-control");
+
+    camSlider("rngCamFOV", "FOV:", 5, 130, 40, (fov) =>{
+        // console.log(fov);
+        bus.dispatch(EVENTS.CAM_FOV, fov)
+    }, "right-control");
 
 
     // Manage the Camera Options Dialog
