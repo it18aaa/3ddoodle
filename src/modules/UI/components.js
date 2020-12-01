@@ -186,11 +186,11 @@ export function checkBox(id, text, callback, container = "button-container") {
 
 }
 
-export function camSlider(id, text, min, max, val, callback, container = "button-container") {
+export function camSlider(id, text, min, max, val, step, callback, container = "button-container") {
 
     let content = `
     <label for='${id}'>${text}</label>
-    <input id='${id}' type='range' min='${min}' max='${max}' step=1 value=${val} />    
+    <input id='${id}' type='range' min='${min}' max='${max}' step='${step}' value=${val} />    
       `;
 
     // render the content

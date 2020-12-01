@@ -215,15 +215,18 @@ export function initUI(bus) {
     }, "sun-control");
 
 
-    camSlider("rngCamDistance", "Dist:", 1, 100, 10, (dist) =>{        
+    camSlider("rngCamDistance", "Dist:", 1, 100, 10, 1, (dist) =>{        
         bus.dispatch(EVENTS.CAM_DISTANCE, dist)
     }, "right-control");
 
-    camSlider("rngCamFOV", "FOV:", 5, 130, 40, (fov) =>{
-        // console.log(fov);
+    camSlider("rngCamFOV", "FOV:", 5, 130, 40, 1, (fov) =>{
         bus.dispatch(EVENTS.CAM_FOV, fov)
     }, "right-control");
 
+    camSlider("rngHeight", "Height", 0, Math.PI/2, Math.Pi/4, .001, (beta) =>{        
+        bus.dispatch(EVENTS.CAM_HEIGHT, beta);
+
+    }, "right-control");
 
     // Manage the Camera Options Dialog
     // Open the dialog, update the
