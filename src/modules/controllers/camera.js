@@ -32,12 +32,11 @@ export function initCameraController(state) {
     });
 
     state.bus.subscribe(EVENTS.CAM_HEIGHT, (beta) => {
-        
-        const cam = state.scene.activeCamera;        
-        // cam.detachControl();
-        //
+        // round the number to two decimal places to avoid
+        // NaN error on camera beta in alpha rotation
+        state.scene.activeCamera.beta = Math.round(beta * 100)/100;
+        // console.log(cam)
         // cam.attachControl();
-        alert("not implemented yet")
     });
 
     //  CAMERA ORIENTATED EVENTS>...

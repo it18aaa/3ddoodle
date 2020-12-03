@@ -236,7 +236,22 @@ export function initUI(bus) {
         "button-container"
     );
 
-    $("#btnDebug").on("click", () => {
-        bus.dispatch(EVENTS.GUI_DEBUG);
-    });
+
+    button2("btnDebug","db", bus, ()=> {
+        bus.dispatch(EVENTS.GUI_DEBUG);        
+    })
+
+    button2("bntPresetN", "N", bus, ()=> {
+        bus.dispatch(EVENTS.CAM_PRESET, 1);
+    }, "sun-control")
+    button2("bntPresetE", "E", bus, ()=> {
+        bus.dispatch(EVENTS.CAM_PRESET, 2);
+    }, "sun-control")
+    button2("bntPresetW", "W", bus, ()=> {
+        bus.dispatch(EVENTS.CAM_PRESET, 3);
+    }, "sun-control")
+    button2("bntPresetS", "S", bus, ()=> {
+        bus.dispatch(EVENTS.CAM_PRESET, 4);
+     } , "sun-control")
+    
 }
