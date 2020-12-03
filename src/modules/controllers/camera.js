@@ -1,12 +1,6 @@
-import {
-    EVENTS
-} from '../event/types'
-import {
-    animateCameraTo
-} from '../utility/animateCameraTo'
-import {
-    Camera
-} from "@babylonjs/core/Cameras/camera";
+import { EVENTS } from "../event/types";
+import { animateCameraTo } from "../utility/animateCameraTo";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 // helper function to determine if the camera has
 // controls attached to it
@@ -15,12 +9,35 @@ export function getCameraActive(camera) {
 }
 
 export function initCameraController(state) {
-
     const camera = state.scene.activeCamera;
 
-    
     // attach camera to scene to start off with...
     camera.attachControl(state.canvas, false);
+
+    state.bus.subscribe(EVENTS.CAM_DISTANCE, (distance) => {
+        const cam = state.scene.activeCamera;
+        if (cam.mode == Camera.PERSPECTIVE_CAMERA) {
+            cam.radius = distance;
+        } else if (cam.mode == Camera.ORTHOGRAPHIC_CAMERA) {
+            setOrthoMode(cam, distance);
+        }
+    });
+
+    state.bus.subscribe(EVENTS.CAM_FOV, (fov) => {
+        const cam = state.scene.activeCamera;
+        if (cam.mode == Camera.PERSPECTIVE_CAMERA) {
+            // set field of view, converting degrees to radians
+            state.scene.activeCamera.fov = fov * (Math.PI / 180);
+        }
+    });
+
+    state.bus.subscribe(EVENTS.CAM_HEIGHT, (beta) => {
+        // round the number to two decimal places to avoid
+        // NaN error on camera beta in alpha rotation
+        state.scene.activeCamera.beta = Math.round(beta * 100)/100;
+        // console.log(cam)
+        // cam.attachControl();
+    });
 
     //  CAMERA ORIENTATED EVENTS>...
     // change between orthographic and perspective view
@@ -29,23 +46,24 @@ export function initCameraController(state) {
         const camera = state.scene.activeCamera;
         if (camera.mode == Camera.PERSPECTIVE_CAMERA) {
             // TODO: hardcoded vars
-            const distance = payload && payload.distance ? payload.distance : 26;
-            setOrthoMode(distance);
+            const distance =
+                payload && payload.distance ? payload.distance : 26;
+            setOrthoMode(camera, distance);
             camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
         } else {
-            setOrthoMode(payload.distance);
-        }
-
-        function setOrthoMode(distance) {
-            const aspect =
-               state.scene.getEngine().getRenderingCanvasClientRect().height /
-                state.scene.getEngine().getRenderingCanvasClientRect().width;
-            camera.orthoLeft = -distance / 3;
-            camera.orthoRight = distance / 3;
-            camera.orthoBottom = camera.orthoLeft * aspect;
-            camera.orthoTop = camera.orthoRight * aspect;
+            setOrthoMode(camera, payload.distance);
         }
     });
+
+    function setOrthoMode(camera, distance) {
+        const aspect =
+            state.scene.getEngine().getRenderingCanvasClientRect().height /
+            state.scene.getEngine().getRenderingCanvasClientRect().width;
+        camera.orthoLeft = -distance / 3;
+        camera.orthoRight = distance / 3;
+        camera.orthoBottom = camera.orthoLeft * aspect;
+        camera.orthoTop = camera.orthoRight * aspect;
+    }
 
     // change to perspective mode
     state.bus.subscribe(EVENTS.GUI_CAMERA_PERSPECTIVE, (payload) => {
@@ -72,7 +90,7 @@ export function initCameraController(state) {
             data.distance = camera.orthoRight * 3;
         }
         data.aspect =
-           state.scene.getEngine().getRenderingCanvasClientRect().height /
+            state.scene.getEngine().getRenderingCanvasClientRect().height /
             state.scene.getEngine().getRenderingCanvasClientRect().width;
         state.bus.dispatch(EVENTS.CAMERA_INFO, data);
     });
@@ -104,16 +122,15 @@ export function initCameraController(state) {
         camera.attachControl(state.canvas, true);
     });
 
-
     // listen for double click, focus the camera
     state.canvas.addEventListener("dblclick", function () {
-
         const camera = state.scene.activeCamera;
         const scene = state.scene;
 
         if (getCameraActive(camera)) {
             const picked = scene.pick(scene.pointerX, scene.pointerY);
-            animateCameraTo(scene,
+            animateCameraTo(
+                scene,
                 picked.pickedPoint.x, // targetx
                 picked.pickedPoint.y,
                 picked.pickedPoint.z, //
@@ -125,5 +142,4 @@ export function initCameraController(state) {
             ); // framecount
         }
     });
-
 }

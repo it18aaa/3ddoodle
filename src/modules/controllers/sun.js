@@ -26,9 +26,6 @@ export function initSunController(state) {
 
     state.sunOffset = Math.PI/2 // for some reason sun is 90degrees cw out
 
-    
-
-
     state.bus.subscribe(EVENTS.LOCATION_SET, (location) => {
         state.location = location;
         updateDateAndLocation(state);        
@@ -56,6 +53,19 @@ export function initSunController(state) {
     state.bus.subscribe(EVENTS.SHADOWS_OFF, ()=>{
         console.log("shadows off!")
         state.scene.shadowsEnabled = false;
+    });
+
+    state.bus.subscribe(EVENTS.SKY_ON, ()=> {
+        console.log("sky on")
+        const skybox = state.scene.getMeshByName("skyBox");
+        skybox.visibility = 1;
+    });
+
+    state.bus.subscribe(EVENTS.SKY_OFF, ()=> {
+        console.log("sky off")
+        const skybox = state.scene.getMeshByName("skyBox")
+        console.log(skybox)
+        skybox.visibility = 0;
     });
 }
 

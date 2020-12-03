@@ -45,6 +45,9 @@ export class CameraOptionsDialog extends Dialog {
         </div>
 
         `;
+                
+
+
     return content;
   }
 
@@ -55,9 +58,7 @@ export class CameraOptionsDialog extends Dialog {
       this.updateOrtho();
     } else {
       this.updatePersp();
-    }
-
-    
+    }    
   }
 
   updatePersp() {
@@ -108,8 +109,7 @@ export class CameraOptionsDialog extends Dialog {
     });
 
     // perspective range slider
-    // range slider, dispatch mode method
-    // $(`#${this.pid}rng`).on('change', evt => {
+    // range slider, dispatch mode method    
     $(document).on("input", `#${this.pid}rng`, (evt) => {
       this.bus.dispatch(EVENTS.GUI_CAMERA_PERSPECTIVE, {
         fov: evt.target.value,
