@@ -1,34 +1,17 @@
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { EVENTS } from "../event/types";
-import { 
-    initGroundController
-} from "./ground";
-import {
-    initFenceController
-} from "./fence";
+import { initGroundController } from "./ground";
+import { initFenceController } from "./fence";
 
-import {
-    PointerDragBehavior
-} from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
-import {
-    Vector3
-} from "@babylonjs/core/Maths/math.vector";
-import {
-    Color3
-} from "@babylonjs/core/Maths/math.color";
-import {
-    PlaneRotationGizmo
-} from "@babylonjs/core/Gizmos/planeRotationGizmo";
-import {
-    TextBlock
-} from "@babylonjs/gui/2D/controls/textBlock";
-import {
-    Counter 
-} from "../utility/counter";
+import { PointerDragBehavior } from "@babylonjs/core/Behaviors/Meshes/pointerDragBehavior";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { PlaneRotationGizmo } from "@babylonjs/core/Gizmos/planeRotationGizmo";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { Counter } from "../utility/counter";
 
 export function initModelController(state) {
-    
-    // a counter for unique naming, and a utility layer for 
+    // a counter for unique naming, and a utility layer for
     // labels
     state.nameCounter = new Counter();
     // const utilityLayer = state.utilityLayer;
@@ -47,7 +30,6 @@ export function initModelController(state) {
     );
     gizmo.sensitivity = 14;
 
-
     // initialise events for ground material and fences...
     initGroundController(state);
     initFenceController(state);
@@ -60,24 +42,22 @@ export function initModelController(state) {
     // selection
     // let selected = null;
 
-
     // when a model is selected, add drag behaviour and attach
     // rotation gizmo
-    state.bus.subscribe(EVENTS.MODEL_SELECT, item => {        
+    state.bus.subscribe(EVENTS.MODEL_SELECT, (item) => {
         state.selected = item.id;
         const mesh = state.scene.getMeshByUniqueID(item.id);
         mesh.addBehavior(pointerDragBehavior);
-            gizmo.attachedMesh = mesh;        
+        gizmo.attachedMesh = mesh;
         state.modelLabel.text = mesh.name;
-        state.modelLabel.linkWithMesh(mesh)
+        state.modelLabel.linkWithMesh(mesh);
         state.modelLabel.isVisible = true;
     });
 
-
     // when a mdel is deslected, remove drag behaviour,
     // and detach gizmo
-    state.bus.subscribe(EVENTS.MODEL_UNSELECT, item => {
-        if(state.selected) {
+    state.bus.subscribe(EVENTS.MODEL_UNSELECT, (item) => {
+        if (state.selected) {
             const mesh = state.scene.getMeshByUniqueID(state.selected);
             state.selected = null;
             mesh.removeBehavior(mesh.getBehaviorByName("PointerDrag"));
@@ -85,47 +65,127 @@ export function initModelController(state) {
             state.modelLabel.text = "";
             state.modelLabel.linkWithMesh(null);
             state.modelLabel.isVisible = false;
-        }        
+        }
     });
-
 
     // when camera mode is engaged, we need to deselected any selected
     // meshes, otherwise drag controls will clash with camera controls
-    // and models will slide around 
-    state.bus.subscribe(EVENTS.MODE_CAMERA, ()=> {
-        if(state.selected) {
-            state.bus.dispatch(EVENTS.MODEL_UNSELECT, { id: state.selected})
+    // and models will slide around
+    state.bus.subscribe(EVENTS.MODE_CAMERA, () => {
+        if (state.selected) {
+            state.bus.dispatch(EVENTS.MODEL_UNSELECT, { id: state.selected });
         }
     });
 
     //
-    state.bus.subscribe(EVENTS.DELETE_REQUEST, ()=> {
+    state.bus.subscribe(EVENTS.DELETE_REQUEST, () => {
         // do we have a model selected?
-        if(state.selected) {
+        if (state.selected) {
             const mesh = state.scene.getMeshByUniqueID(state.selected);
-            state.bus.dispatch(EVENTS.DELETE_CONFIRM, 
-                {
-                    id: state.selected,
-                    name: mesh.name
-                });
-        };
+            state.bus.dispatch(EVENTS.DELETE_CONFIRM, {
+                id: state.selected,
+                name: mesh.name,
+            });
+        }
     });
 
-
-
-    state.bus.subscribe(EVENTS.DELETE_DO, item => {
+    state.bus.subscribe(EVENTS.DELETE_DO, (item) => {
         console.log("Delete ", item);
         const unselected = state.scene.getMeshByUniqueID(item.id);
         unselected.removeBehavior(unselected.getBehaviorByName("PointerDrag"));
         state.selected = null;
         state.modelLabel.text = "";
         state.modelLabel.isVisible = false;
-        gizmo.attachedMesh =null;
+        gizmo.attachedMesh = null;
         state.scene.removeMesh(unselected);
         unselected.dispose();
     });
 
-    state.bus.subscribe(EVENTS.MODEL_ADD, item => {
+    state.bus.subscribe(EVENTS.MODEL_ADD, (item) => {        
+        switch (item.model.type) {
+            case "morph":
+                addMorphModels(item);
+                break;
+            case "static":
+                addStaticModels(item);
+                break;
+        }
+    });
+
+
+    function addMorphModels(item) {
+        let mesh = state.scene.getMeshByName(item.model.name)
+        let meshtarget = state.scene.getMeshByName(`${item.model.name}-target`);
+    }
+
+    function addStaticModels(item) {
+        // get the mesh from the scene
+        let mesh = state.scene.getMeshByName(item.model.name);
+                
+        // if the mesh is in the scene, isntantiate it according
+        // to item details
+        if (mesh) {            
+            makeInstances(mesh, item);
+        } else {
+            // otherwise load the mesh
+            SceneLoader.ImportMeshAsync(
+                "",
+                state.url + item.model.path,
+                item.model.file,
+                state.scene
+            )            
+            .then((result) => {                
+                mesh = result.meshes[0];
+                mesh.name = item.model.name;
+                mesh.isVisible = false;
+
+                // and instantiate it
+                makeInstances(mesh, item);
+            })
+            .catch((err) =>{
+                console.log("unable to import mesh ", item);
+            });
+        }
+    }
+
+        
+function makeInstances(mesh, item) {
+
+    // retrieve the stringline locations
+    const positions = state.outline.getLines();
+
+    // if there aren't any, try middle of screen
+    if (positions.length == 0) {
+        // pick the middle of the screen ?
+        const ray = state.scene.activeCamera.getForwardRay();
+        const pickingInfo = ray.intersectsMesh(
+            state.scene.getMeshByName("ground1")
+        );
+        positions[0] = pickingInfo.pickedPoint;
+    }
+
+    const name = item.model.name;
+    const num = state.nameCounter.get().toString();
+
+    console.log(`creating instance ${name}.${num}.[x]`);
+
+    if (positions.length > 0) {
+        state.nameCounter.increment();
+        positions.forEach((position, index) => {
+            const inst = mesh.createInstance(`${name}.${num}.${index}`);
+            inst.position = position;
+            inst.isVisible = true;
+            state.shadowGenerator.addShadowCaster(inst);
+        });
+    }
+}       
+
+
+    function addMorphModels(item) {}
+
+    // the logic below is wrong, replace this method
+    // with a more robust version
+    state.bus.subscribe(EVENTS.MODEL_ADD_OLD, (item) => {
         const lines = state.outline.getLines();
 
         // check if model loaded, if so, create instance
@@ -135,44 +195,51 @@ export function initModelController(state) {
             // mesh already exists, creating instance of it!
             state.nameCounter.increment();
             lines.forEach((point, index) => {
-                const instance = mesh.createInstance(`${item.model.name}.${state.nameCounter.get().toString()}.${index}`);
+                const instance = mesh.createInstance(
+                    `${
+                        item.model.name
+                    }.${state.nameCounter.get().toString()}.${index}`
+                );
                 instance.position = point;
                 instance.isVisible = true;
                 state.shadowGenerator.addShadowCaster(instance);
             });
-
         } else {
-            //  mesh doesn't yet exist, so load it 
+            //  mesh doesn't yet exist, so load it
             SceneLoader.ImportMesh(
                 "",
                 state.url + item.model.path,
                 item.model.file,
                 state.scene,
                 (meshes) => {
-                    console.log(meshes)
+                    console.log(meshes);
                     // get our parent mesh... the parent...
                     const mesh = meshes[0];
                     state.nameCounter.increment();
                     mesh.name = item.model.name + state.nameCounter.get();
                     mesh.isVisible = false;
 
-                    // create instances on the basis of how many 
+                    // create instances on the basis of how many
                     // stringline points there are
                     lines.forEach((point, index) => {
-                        const instance = mesh.createInstance(`${item.model.name}.${state.nameCounter.get().toString()}.${index}`);
+                        const instance = mesh.createInstance(
+                            `${
+                                item.model.name
+                            }.${state.nameCounter.get().toString()}.${index}`
+                        );
 
                         instance.position = point;
                         instance.isVisible = true;
                         state.shadowGenerator.addShadowCaster(instance);
                     });
-                });
+                }
+            );
         }
     });
-
 }
 
 function makeModelLabel(name) {
-    const label = new TextBlock("selectedLabel", "")
+    const label = new TextBlock("selectedLabel", "");
     label.outlineColor = "black";
     label.outlineWidth = 4;
     label.fontSize = 22;
