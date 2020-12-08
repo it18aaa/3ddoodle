@@ -51,5 +51,6 @@ export const EVENTS = Object.freeze({
     SKY_OFF: "SKY_OFF",
     CAM_DISTANCE: "CAM_DISTANCE",
     CAM_FOV: "CAM_FOV",
-    CAM_HEIGHT: "CAM_HEIGHT"
+    CAM_HEIGHT: "CAM_HEIGHT",
+    AGE_CHANGE: "AGE_CHANGE"
 });
