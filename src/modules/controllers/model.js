@@ -98,13 +98,21 @@ export function initModelController(state) {
         state.modelLabel.isVisible = false;
         gizmo.attachedMesh = null;
         state.scene.removeMesh(unselected);
+        // is instance in dynamicmodels?
+        if(state.scene.metadata.dynamicModels.includes(item.id)) {
+            // if so filter it out
+            state.scene.metadata.dynamicModels = state.scene.metadata.dynamicModels.filter(id => id !== item.id);
+            state.scene.metadata.dynamicModelData = state.scene.metadata.dynamicModels.filter(id => id !== item.id);
+
+        }
+
         unselected.dispose();
     });
 
-    state.bus.subscribe(EVENTS.MODEL_ADD, (item) => {        
+    state.bus.subscribe(EVENTS.MODEL_ADD, (item) => {
         switch (item.model.type) {
-            case "morph":
-                addMorphModels(item);
+            case "dynamic":
+                addDynamicModels(item);
                 break;
             case "static":
                 addStaticModels(item);
@@ -112,131 +120,97 @@ export function initModelController(state) {
         }
     });
 
-
-    function addMorphModels(item) {
-        let mesh = state.scene.getMeshByName(item.model.name)
-        let meshtarget = state.scene.getMeshByName(`${item.model.name}-target`);
+    async function addDynamicModels(item) {
+        const baseMesh = await getBaseMesh(item);
+        if(!baseMesh) {
+            console.log("There was an issue loading the mess. ", baseMesh, item);
+            return;
+        }        
+        makeInstances(baseMesh, item);
     }
 
-    function addStaticModels(item) {
-        // get the mesh from the scene
-        let mesh = state.scene.getMeshByName(item.model.name);
-                
-        // if the mesh is in the scene, isntantiate it according
-        // to item details
-        if (mesh) {            
-            makeInstances(mesh, item);
+    async function addStaticModels(item) {
+         const baseMesh = await getBaseMesh(item);
+        if (baseMesh) {
+            console.log(baseMesh);
+            makeInstances(baseMesh, item);
         } else {
-            // otherwise load the mesh
-            SceneLoader.ImportMeshAsync(
+            console.log("There was an issue loading the mesh.", baseMesh, item);
+        }
+    }
+
+    async function getBaseMesh(item) {
+        let mesh = state.scene.getMeshByName(item.model.name);
+        if (!mesh) {
+            let result = await SceneLoader.ImportMeshAsync(
                 "",
                 state.url + item.model.path,
                 item.model.file,
                 state.scene
-            )            
-            .then((result) => {                
-                mesh = result.meshes[0];
-                mesh.name = item.model.name;
-                mesh.isVisible = false;
+            );
 
-                // and instantiate it
-                makeInstances(mesh, item);
-            })
-            .catch((err) =>{
-                console.log("unable to import mesh ", item);
-            });
+            mesh = result.meshes[0];
+            mesh.name = item.model.name;
+            mesh.isVisible = false;
+            console.log(mesh);      
         }
+        return mesh ? mesh : null;
     }
+
+
+    function getCentreOfScreen() {
+        const ray = state.scene.activeCamera.getForwardRay();
+            const pickingInfo = ray.intersectsMesh(
+                state.scene.getMeshByName("ground1")
+            );
+            return pickingInfo.pickedPoint;
+    }
+
+    function makeInstances(mesh, item) {
+        // retrieve the stringline locations
+        const positions = state.outline.getLines();
+
+        // if there aren't any, try middle of screen
+        if (positions.length == 0) {            
+            positions[0] = getCentreOfScreen();
+        }
+
+        const name = item.model.name;
 
         
-function makeInstances(mesh, item) {
-
-    // retrieve the stringline locations
-    const positions = state.outline.getLines();
-
-    // if there aren't any, try middle of screen
-    if (positions.length == 0) {
-        // pick the middle of the screen ?
-        const ray = state.scene.activeCamera.getForwardRay();
-        const pickingInfo = ray.intersectsMesh(
-            state.scene.getMeshByName("ground1")
-        );
-        positions[0] = pickingInfo.pickedPoint;
-    }
-
-    const name = item.model.name;
-    const num = state.nameCounter.get().toString();
-
-    console.log(`creating instance ${name}.${num}.[x]`);
-
-    if (positions.length > 0) {
+        const num = state.nameCounter.get().toString();
         state.nameCounter.increment();
-        positions.forEach((position, index) => {
-            const inst = mesh.createInstance(`${name}.${num}.${index}`);
-            inst.position = position;
-            inst.isVisible = true;
-            state.shadowGenerator.addShadowCaster(inst);
-        });
-    }
-}       
+        
+        if (positions.length > 0) {            
+            positions.forEach((position, index) => {
+                const inst = mesh.createInstance(`${name}.${num}.${index}`);
+                // if the model is dynamic, put it in the dynamic models array
+                if(item.model.type == "dynamic") {
+                    // console.log(inst.uniqueId);
+                    // console.log(inst.name);  // use name inste
 
+                    // using name instead of uniqueID, as uniqueID can change
+                    // when file is saved and reopened!
+                    state.scene.metadata.dynamicModels.push(inst.name);
+                    // growth info is in here, so just lump it on the 
 
-    function addMorphModels(item) {}
-
-    // the logic below is wrong, replace this method
-    // with a more robust version
-    state.bus.subscribe(EVENTS.MODEL_ADD_OLD, (item) => {
-        const lines = state.outline.getLines();
-
-        // check if model loaded, if so, create instance
-        // otherwise load up the mesh
-        const mesh = state.scene.getMeshByName(item.model.name);
-        if (mesh) {
-            // mesh already exists, creating instance of it!
-            state.nameCounter.increment();
-            lines.forEach((point, index) => {
-                const instance = mesh.createInstance(
-                    `${
-                        item.model.name
-                    }.${state.nameCounter.get().toString()}.${index}`
-                );
-                instance.position = point;
-                instance.isVisible = true;
-                state.shadowGenerator.addShadowCaster(instance);
+                    state.scene.metadata.dynamicModelData.push({
+                        name: inst.name,
+                        data: item.model
+                    })
+                    // instances metadata
+                    // inst.metadata = item;
+                }                                
+                inst.position = position;
+                inst.isVisible = true;
+                state.shadowGenerator.addShadowCaster(inst);
             });
-        } else {
-            //  mesh doesn't yet exist, so load it
-            SceneLoader.ImportMesh(
-                "",
-                state.url + item.model.path,
-                item.model.file,
-                state.scene,
-                (meshes) => {
-                    console.log(meshes);
-                    // get our parent mesh... the parent...
-                    const mesh = meshes[0];
-                    state.nameCounter.increment();
-                    mesh.name = item.model.name + state.nameCounter.get();
-                    mesh.isVisible = false;
-
-                    // create instances on the basis of how many
-                    // stringline points there are
-                    lines.forEach((point, index) => {
-                        const instance = mesh.createInstance(
-                            `${
-                                item.model.name
-                            }.${state.nameCounter.get().toString()}.${index}`
-                        );
-
-                        instance.position = point;
-                        instance.isVisible = true;
-                        state.shadowGenerator.addShadowCaster(instance);
-                    });
-                }
-            );
-        }
-    });
+        }        
+        console.log(state.scene)
+    }
 }
+
+
 
 function makeModelLabel(name) {
     const label = new TextBlock("selectedLabel", "");

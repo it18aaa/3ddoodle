@@ -8,14 +8,15 @@ export function initFileController(state) {
     // file event handlers
 
     state.bus.subscribe(EVENTS.SCENE_SAVE, (item) => {
-        // console.log("SAVE: ", item)
-
+        
         state.outline.reset();
         state.bus.dispatch(EVENTS.MODEL_UNSELECT);
-        state.scene.metadata = {};
+        
         state.scene.metadata.groundLevel = state.groundLevel.get()
+        state.scene.metadata.nameCounter = state.nameCounter.get();
+        
         const serializedScene = SceneSerializer.Serialize(state.scene);
-        // const strScene = JSON.stringify(serializedScene);
+        
 
         const data = {
             method: "POST",
@@ -125,6 +126,12 @@ export function initFileController(state) {
                 state.scene.getMeshByName("ground1").material = grid;
                 
                 state.groundLevel.set(state.scene.metadata.groundLevel);                
+                if(!state.scene.metadata.dynamicModels) {
+                    state.scene.metadata.dynamicModels = [];
+                }
+
+                state.nameCounter.set(state.scene.metadata.nameCounter);
+                state.nameCounter.increment();
 
                 state.bus.dispatch(EVENTS.MODE_CAMERA);
             });

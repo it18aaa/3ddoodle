@@ -12,6 +12,10 @@ export class Counter {
     get() {
         return this.counter;
     }
+    set(val) {
+        this.counter = val;
+    }
+
     reset() {
         this.counter = 0;
     }

@@ -9,6 +9,7 @@ import { initGrowthController } from "./growth";
 
 
 export function initEditor(state) {
+    state.scene.metadata = {};
     initCameraController(state);
     initModelController(state);
     initKeyboard(state);
