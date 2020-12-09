@@ -65,7 +65,7 @@ export function initFileController(state) {
         const skybox = state.scene.getMeshByName("skyBox");
         skybox.dispose();
         const grid = state.scene.getMaterialByName("gridMaterial");
-        grid.dispose();
+        // grid.dispose();
         const sky = state.scene.getMaterialByName("skyMaterial");
         sky.dispose();
 
@@ -122,7 +122,7 @@ export function initFileController(state) {
                 state.scene.removeMesh(ground);
                 ground.dispose();
 
-                const grid = state.scene.getMaterialByName("gridMaterial");
+                // const grid = state.scene.getMaterialByName("gridMaterial");
                 state.scene.getMeshByName("ground1").material = grid;
                 
                 state.groundLevel.set(state.scene.metadata.groundLevel);                
