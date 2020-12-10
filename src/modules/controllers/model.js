@@ -99,11 +99,10 @@ export function initModelController(state) {
         gizmo.attachedMesh = null;
         state.scene.removeMesh(unselected);
         // is instance in dynamicmodels?
-        if(state.scene.metadata.dynamicModels.includes(item.id)) {
-            // if so filter it out
-            state.scene.metadata.dynamicModels = state.scene.metadata.dynamicModels.filter(id => id !== item.id);
-            state.scene.metadata.dynamicModelData = state.scene.metadata.dynamicModels.filter(id => id !== item.id);
-
+        if(state.scene.metadata.dynamicModels.includes(item.name)) {         
+            // if so filter it out, and its data              
+            state.scene.metadata.dynamicModels = state.scene.metadata.dynamicModels.filter(name => name !== item.name);
+            state.scene.metadata.dynamicModelData = state.scene.metadata.dynamicModelData.filter(name=> name !== item.name );
         }
 
         unselected.dispose();
