@@ -214,6 +214,9 @@ export function initUI(bus) {
         }
     }, "sun-control");
 
+    camSlider("rngAge", "Age:", 0, 100, 0, 1, (age) => {
+        bus.dispatch(EVENTS.AGE_CHANGE, (age));
+    }, "sun-control");
 
     camSlider("rngCamDistance", "Dist:", 1, 100, 10, 1, (dist) =>{        
         bus.dispatch(EVENTS.CAM_DISTANCE, dist)
