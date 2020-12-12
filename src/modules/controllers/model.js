@@ -39,8 +39,6 @@ export function initModelController(state) {
     state.modelLabel.isVisible = false;
     state.adt.addControl(state.modelLabel);
 
-    // selection
-    // let selected = null;
 
     // when a model is selected, add drag behaviour and attach
     // rotation gizmo
