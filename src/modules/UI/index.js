@@ -96,7 +96,7 @@ export function initUI(bus) {
 
     $("body").append(content);    
 
-    button2("btnClear", "Clear", bus, ()=> {
+    button2("btnClear", "New", bus, ()=> {
         bus.dispatch(EVENTS.CLEAR_REQUEST);
     })
 
@@ -134,10 +134,16 @@ export function initUI(bus) {
 
     // when the posts are moved the lengths will change
     bus.subscribe(EVENTS.STRINGLINE_LENGTHS_UPDATED, (data) => {
-        if (data.lengths.length > 0) {
+        // if (data.lengths.length > 0) {
             dialogs.lengths.update(data);
-        }
+        // }
     });
+
+    // when the stringline is reset..
+    bus.subscribe(EVENTS.GUI_CLEAR_STRINGLINE, () => {
+        // dialogs.lengths.update({ total: 0, lengths: {}});        
+    });
+
 
     button2("btnModeEdit", "Edit", bus, () => {
         bus.dispatch(EVENTS.MODE_EDIT);

@@ -1,13 +1,13 @@
 import { EVENTS } from "../../event/types";
 import $ from "jquery";
-import { getButton, getTextField } from "../components"
+import { getButton, getTextField } from "../components";
 
 export class Dialog {
     static count = 0;
     static fadeInTime = 300;
     title;
     id;
-    hidden = true;  // all modals are hidden to begin with
+    hidden = true; // all modals are hidden to begin with
     content;
     bus;
     buttonCancelId;
@@ -17,8 +17,10 @@ export class Dialog {
         this.bus = eventBus;
         this.id = id;
         this.buttonOkayId = `btn${id}-OKAY`;
-        this.buttonCancelId = `btn${id}-CANCEL`
+        this.buttonCancelId = `btn${id}-CANCEL`;
         this.title = title ? title : "blank dialog!";
+        this.styleClass = "modal";
+        this.toolWindow = false;
         // this.render();  // this is an anti-pattern, needs to be moved out
 
         // init static variable if not defined
@@ -39,12 +41,12 @@ export class Dialog {
 
     render() {
         var output;
-        output = `<div class='modal' id='${this.id}'>`;
+        output = `<div class='${this.styleClass}' id='${this.id}'>`;
         output += `<div id='${this.id}X' class='modal-close'>X</div>`;
         output += `<div class='modal-title'>${this.title}</div>`;
         output += ``;
 
-        // render content here.... 
+        // render content here....
         output += `<div class='modal-content'>`;
         if (this.contents()) {
             // output += 'parent:'
@@ -54,34 +56,33 @@ export class Dialog {
 
         output += `<div id='${this.id}-button-container' class='modal-button-container'
         style='text-align: right'>`;
-        output += getButton(`${this.buttonOkayId}`, 'Okay');
-        output += getButton(`${this.buttonCancelId}`, 'Cancel');
+        output += getButton(`${this.buttonOkayId}`, "Okay");
+        output += getButton(`${this.buttonCancelId}`, "Cancel");
         output += `</div>`;
         output += `</div>`;
 
-        $('body').append(output);
+        $("body").append(output);
 
         // call back for the ok button
-        $(`#${this.buttonOkayId}`).on('click', () => {
+        $(`#${this.buttonOkayId}`).on("click", () => {
             this.accept();
-        })
+        });
 
         // call back for the cancel button
-        $(`#${this.buttonCancelId}`).on('click', () => {
+        $(`#${this.buttonCancelId}`).on("click", () => {
             this.cancel();
-        })
+        });
 
-        $(`#${this.id}X`).on('click', () => {
+        $(`#${this.id}X`).on("click", () => {
             this.cancel();
-        })
+        });
 
         // call backs for the close button
         //
-        $(`#${this.id}X`).css('cursor','pointer')
-        $(`#${this.id}X`).on('click', () => {
+        $(`#${this.id}X`).css("cursor", "pointer");
+        $(`#${this.id}X`).on("click", () => {
             this.cancel();
-        })
-
+        });
 
         // wire up any other call backs
         this.callbacks();
@@ -100,15 +101,18 @@ export class Dialog {
     }
 
     show() {
-        // if there are no dialogs open already
-        // and this dialog is hidden
-        if (Dialog.getVisibleCount() == 0 && this.hidden == true) {
+        // this isn't a tool window, so there can be only one
+        if (!this.toolWindow) {
+            // if there are no dialogs open already
+            // and this dialog is hidden
+            if (Dialog.getVisibleCount() == 0 && this.hidden == true) {
+                $(`#${this.id}`).fadeIn(Dialog.fadeInTime);
+                Dialog.setVisibleCount(Dialog.getVisibleCount() + 1);
+                this.hidden = false;
+            }
+        } else if (this.hidden == true) {
             $(`#${this.id}`).fadeIn(Dialog.fadeInTime);
-            Dialog.setVisibleCount(Dialog.getVisibleCount() + 1);
             this.hidden = false;
-        } else {
-            // DEBUG
-            // console.log("dialog already open!", Dialog.getVisibleCount())
         }
     }
 
@@ -116,20 +120,20 @@ export class Dialog {
         // if this dialog is not hidden, then hide it
         if (this.hidden == false) {
             $(`#${this.id}`).fadeOut(Dialog.fadeInTime);
-            Dialog.setVisibleCount(Dialog.getVisibleCount() - 1);
+            if (!this.toolWindow) {
+                Dialog.setVisibleCount(Dialog.getVisibleCount() - 1);
+            }
             this.hidden = true;
         }
     }
 
     // override this to perform a different action
     accept() {
-        
         // hide the form
-        this.bus.dispatch(EVENTS.GUI_DIALOG_ACCEPT,
-            {
-                type: "FORMDATA",
-                height: 1.4,
-            });
+        this.bus.dispatch(EVENTS.GUI_DIALOG_ACCEPT, {
+            type: "FORMDATA",
+            height: 1.4,
+        });
         this.resetForm();
         this.hide();
     }
@@ -137,11 +141,9 @@ export class Dialog {
     cancel() {
         // wire up the cancel call back
         // clear the form and hide it
-        this.bus.dispatch(EVENTS.GUI_DIALOG_ACCEPT,
-            {
-                particulars:
-                    "form data"
-            });
+        this.bus.dispatch(EVENTS.GUI_DIALOG_ACCEPT, {
+            particulars: "form data",
+        });
         this.resetForm();
         this.hide();
     }

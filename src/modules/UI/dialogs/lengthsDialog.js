@@ -7,6 +7,9 @@ export class LengthsDialog extends Dialog {
   constructor(id, title, eventBus) {
     super(id, title, eventBus);
     // class fields don't work ...
+
+    this.styleClass = this.styleClass + " measurements-dialog";
+    this.toolWindow = true;
   }
 
   update(data) {
