@@ -18,22 +18,23 @@ export function initScene(state) {
     });
 
     state.bus.subscribe(EVENTS.SCREENSHOT_SAVE, () => {
-        ScreenshotTools.CreateScreenshotAsync(
+        // ScreenshotTools.CreateScreenshotAsync(
+        ScreenshotTools.CreateScreenshotUsingRenderTargetAsync(
             state.engine,
             state.scene.activeCamera,
-            { precision: 2 }            
+            { precision: 2 }
         )
-        .then(screenshotData => {            
-            const tab = window.open();
-            let img = tab.document.createElement("img");
-            img.src = screenshotData;
-            tab.document.title = 'Screenshot'; 
-            tab.document.body.appendChild(img);
-        })
-        .catch(err => {
-            console.log("there was an error capturing the screen shot");   
-            console.log("err");
-        })
+            .then((screenshotData) => {
+                const tab = window.open();
+                let img = tab.document.createElement("img");
+                img.src = screenshotData;
+                tab.document.title = "Screenshot";
+                tab.document.body.appendChild(img);
+            })
+            .catch((err) => {
+                console.log("there was an error capturing the screen shot");
+                console.log("err");
+            });
     });
 }
 
