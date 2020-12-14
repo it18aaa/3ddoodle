@@ -129,7 +129,10 @@ export function initUI(bus) {
         console.log("Lengths payload", payload);
         // update the lengths dialog with payload...
         dialogs.lengths.update(payload);
-        dialogs.lengths.show();
+        
+        if(payload.lengths.length != 0) {
+            dialogs.lengths.show();
+        }
     });
 
     // when the posts are moved the lengths will change
@@ -139,10 +142,7 @@ export function initUI(bus) {
         // }
     });
 
-    // when the stringline is reset..
-    bus.subscribe(EVENTS.GUI_CLEAR_STRINGLINE, () => {
-        // dialogs.lengths.update({ total: 0, lengths: {}});        
-    });
+    
 
 
     button2("btnModeEdit", "Edit", bus, () => {
