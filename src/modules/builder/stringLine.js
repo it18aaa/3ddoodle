@@ -41,6 +41,7 @@ export class StringLine {
     this.bus = bus;
     this.snapValue = 0.2;
     this.snapping = true;
+    this.totalLength = 0;
 
     let mx = new Measurement(this.state.scene, this.adt, "x");
     let my = new Measurement(this.state.scene, this.adt, "y");
@@ -324,7 +325,8 @@ export class StringLine {
       });
       this.labels = [];
     }
-
+    this.totalLength = 0;
+    this.lengths = [];
     // this.adt.clear();
   }
 

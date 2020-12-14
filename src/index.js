@@ -43,6 +43,10 @@ state.bus.subscribe(EVENTS.GUI_LENGTH_BUTTON, () => {
 // CLEAR BUTTON - resents the stringline
 state.bus.subscribe(EVENTS.GUI_CLEAR_STRINGLINE, () => {
     state.outline.reset();
+    state.bus.dispatch(EVENTS.GUI_LENGTHS_INFO, {
+        lengths: state.outline.getLengths(),
+        total: state.outline.totalLength,
+    });
 });
 
 // debug if enabled
