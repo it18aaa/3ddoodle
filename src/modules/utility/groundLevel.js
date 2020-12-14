@@ -9,6 +9,11 @@ export class GroundLevel {
     decrement() {
         this.level = this.level - this.incrementSize;
     }
+
+    incrementSizes() {
+        return this.incrementSize;
+    }
+    
     get() {
         return this.level;
     }
