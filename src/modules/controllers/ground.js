@@ -35,5 +35,30 @@ export function initGroundController(state) {
         // micro increment ground level
         state.groundLevel.increment();
     });
+
+    state.bus.subscribe(EVENTS.GROUND_UP, ()=> {        
+        
+        const inc = state.groundLevel.incrementSize;
+        const gl = state.groundLevel.get();
+        const mesh = state.scene.getMeshByUniqueID(state.selected);
+
+        console.log(`y ${mesh.position.y}   gl ${gl} inc ${inc}  gl state ${state.groundLevel.get()}`);
+
+        if(mesh.position.y < gl) {
+            mesh.position.y += inc;            
+        }
+
+        if(mesh.position.y > gl ) {
+            state.groundLevel.increment();            
+        }
+    });
+
+    state.bus.subscribe(EVENTS.GROUND_DOWN, ()=> {
+        const inc = state.groundLevel.incrementSize;
+        const mesh = state.scene.getMeshByUniqueID(state.selected);
+        if(mesh.position.y > 0) { 
+            mesh.position.y -= inc;
+        }
+    });
 }
 
