@@ -240,8 +240,12 @@ export function initUI(bus) {
     );
 
 
-    button2("btnDebug","db", bus, ()=> {
+    button2("btnDebug","debug", bus, ()=> {
         bus.dispatch(EVENTS.GUI_DEBUG);        
+    })
+
+    button2("btn", "Screenshot", bus, ()=> {
+        bus.dispatch(EVENTS.SCREENSHOT_SAVE);
     })
 
     button2("bntPresetN", "N", bus, ()=> {
