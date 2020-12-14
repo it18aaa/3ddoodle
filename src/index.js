@@ -26,8 +26,8 @@ state.canvas = document.getElementById("renderCanvas");
 initState(state);
 
 //  Frames Per Second counter for profiling
-const divFps = document.getElementById("fps");
-const showfps = 1;
+// const divFps = document.getElementById("fps");
+// const showfps = 1;
 
 initEditor(state);
 initUI(state.bus);
@@ -67,9 +67,9 @@ state.running = true;
 // run the renderloop
 state.engine.runRenderLoop(function () {
     if (state.running) {
-        if (showfps) {
-            divFps.innerHTML = state.engine.getFps().toFixed() + " fps";
-        }
+        // if (showfps) {
+        //     divFps.innerHTML = state.engine.getFps().toFixed() + " fps";
+        // }
         state.scene.render();
     }
 });
