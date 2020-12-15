@@ -23,19 +23,30 @@ export function initKeyboard(state) {
                     state.bus.dispatch(EVENTS.MODE_TOGGLE);
                     break;
                 case "ArrowUp":
-                    if(state.selected) {
+                    if (state.selected) {
                         state.bus.dispatch(EVENTS.GROUND_UP);
-                    }                    
+                    }
                     break;
                 case "ArrowDown":
-                    if(state.selected) {
+                    if (state.selected) {
                         state.bus.dispatch(EVENTS.GROUND_DOWN);
-                    }                    
+                    }
+                    break;                    // console.log("keyboard: ", kbInfo.event.key)
+                    
+            }
+        } else if(kbInfo.type === KeyboardEventTypes.KEYDOWN) {
+            switch(kbInfo.event.key) {
+                case "+":                    
+                    state.bus.dispatch(EVENTS.AGE_INCREMENT);
+                    break;
+                case "-":
+                    state.bus.dispatch(EVENTS.AGE_DECREMENT);
                     break;
                 default:
-                    // console.log("keyboard: ", kbInfo.event.key)
-                    break;
+
             }
         }
+
+
     });
 }

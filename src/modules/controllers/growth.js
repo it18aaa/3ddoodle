@@ -3,12 +3,30 @@ import { EVENTS } from "../event/types";
 export function initGrowthController(state) {
     // setup our space
 
+    state.age = 0;
+    state.ageIncrement = 0.05;
     state.scene.metadata.dynamicModels = [];
     state.scene.metadata.dynamicModelData = [];
+
+
+    state.bus.subscribe(EVENTS.AGE_INCREMENT, ()=> {
+        state.age += state.ageIncrement;
+        state.bus.dispatch(EVENTS.AGE_CHANGE, state.age);
+    });
+
+    state.bus.subscribe(EVENTS.AGE_DECREMENT, ()=> {
+        state.age -= state.ageIncrement;
+        state.bus.dispatch(EVENTS.AGE_CHANGE, state.age);
+    });
+
 
     state.bus.subscribe(EVENTS.AGE_CHANGE, (age) => {
         const names = state.scene.metadata.dynamicModels;
         const modelData = state.scene.metadata.dynamicModelData;
+
+        if(state.age != age) {
+            state.age = age;
+        }
 
         if (names.length > 0) {
             names.forEach((name) => {

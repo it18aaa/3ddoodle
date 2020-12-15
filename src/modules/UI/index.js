@@ -220,7 +220,7 @@ export function initUI(bus) {
         }
     }, "sun-control");
 
-    camSlider("rngAge", "Age:", 0, 100, 0, 1, (age) => {
+    camSlider("rngAge", "Age:", 0, 100, 0, .1, (age) => {
         bus.dispatch(EVENTS.AGE_CHANGE, (age));
     }, "sun-control");
 

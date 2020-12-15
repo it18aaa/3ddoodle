@@ -14,8 +14,7 @@ export function initModelController(state) {
     // a counter for unique naming, and a utility layer for
     // labels
     state.nameCounter = new Counter();
-    // const utilityLayer = state.utilityLayer;
-    // const adt = state.adt;
+       
 
     // drag behaviour for garden items!
     const pointerDragBehavior = new PointerDragBehavior({
@@ -75,7 +74,7 @@ export function initModelController(state) {
         }
     });
 
-    //
+    // if we want to delete something...
     state.bus.subscribe(EVENTS.DELETE_REQUEST, () => {
         // do we have a model selected?
         if (state.selected) {
@@ -87,8 +86,8 @@ export function initModelController(state) {
         }
     });
 
-    state.bus.subscribe(EVENTS.DELETE_DO, (item) => {
-        console.log("Delete ", item);
+    // perform the deletion
+    state.bus.subscribe(EVENTS.DELETE_DO, (item) => {        
         const unselected = state.scene.getMeshByUniqueID(item.id);
         unselected.removeBehavior(unselected.getBehaviorByName("PointerDrag"));
         state.selected = null;
@@ -102,7 +101,6 @@ export function initModelController(state) {
             state.scene.metadata.dynamicModels = state.scene.metadata.dynamicModels.filter(name => name !== item.name);
             state.scene.metadata.dynamicModelData = state.scene.metadata.dynamicModelData.filter(name=> name !== item.name );
         }
-
         unselected.dispose();
     });
 
@@ -120,7 +118,7 @@ export function initModelController(state) {
     async function addDynamicModels(item) {
         const baseMesh = await getBaseMesh(item);
         if(!baseMesh) {
-            console.log("There was an issue loading the mess. ", baseMesh, item);
+            console.log("There was an issue loading the mesh. ", baseMesh, item);
             return;
         }        
         makeInstances(baseMesh, item);
@@ -148,8 +146,7 @@ export function initModelController(state) {
 
             mesh = result.meshes[0];
             mesh.name = item.model.name;
-            mesh.isVisible = false;
-            console.log(mesh);      
+            mesh.isVisible = false;            
         }
         return mesh ? mesh : null;
     }
