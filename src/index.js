@@ -14,7 +14,6 @@ import { initUI } from "./modules/UI";
 const state = {};
 state.canvas = document.getElementById("renderCanvas");
 initState(state);
-
 initEditor(state);
 initUI(state.bus);
 
@@ -28,6 +27,8 @@ window.addEventListener("resize", function () {
 
 // set running state
 state.running = true;
+
+state.bus.dispatch(EVENTS.SHOW_SPLASH);
 
 state.engine.runRenderLoop(function () {
     if (state.running) {        
