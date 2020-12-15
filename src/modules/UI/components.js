@@ -7,6 +7,10 @@ export function button(id, text, container = "button-container") {
     $(`.${container}`).append(`<button id='${id}'>${text}</button>`);
 }
 
+export function addSpacer(container) {
+    $(`${container}`).append(`<span>&nbsp;&nbsp;&nbsp;</span>`);
+}
+
 export function button2(
     id,
     text,
